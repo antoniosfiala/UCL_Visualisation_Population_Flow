@@ -157,6 +157,8 @@
       //var i = 0;
       var i = 0;
       var month_counter = 0
+      var slider_remaining;
+      var month_jumps = 30
 
       function f_next_time_step(){
 
@@ -176,32 +178,38 @@
       document.getElementById("one_month_jump").addEventListener("click", function(){
         console.log("going to move one month jump")
 
-        month_counter = i + 30
 
-        intervalId = setInterval(function(){
+        month_counter = i + month_jumps
+
+        month_intervalId = setInterval(function(){
+          document.getElementById("one_month_jump").disabled = true;
            if(i === 539){
-              clearInterval(intervalId);
+              clearInterval(month_intervalId);
               i = 0;
+              document.getElementById("one_month_jump").disabled = false;
               //reset slider to 0 hour
-           } else if (i === month_counter) {
-             clearInterval(intervalId);
-             month_counter = 0;
+           } else if (slider_remaining <= 0){
+             console.log("less than 0");
+             clearInterval(month_intervalId);
+             month_counter = i + month_jumps
+             slider_remaining = month_counter;
+             document.getElementById("one_month_jump").disabled = false;
            } else {
-
-           // increment slider
-           //var current_slider_value = parseInt(document.getElementById('slider').value) + 1;
-           var current_slider_value = i
-           //set new slider value
-           document.getElementById('slider').value = current_slider_value
-           //map.setFilter('collisions', ['==', ['number', ['get', 'time_id']], current_slider_value]);
-           map.setFilter('heat_layer', ['==', ['get', 'time_id'], current_slider_value]);
-           document.getElementById('active-hour').innerText = current_slider_value;
-           console.log("MONTH: || New slider value was set - yay :)")
-
-           console.log(month_counter - i);
-           i++;
+             // increment slider
+             //var current_slider_value = parseInt(document.getElementById('slider').value) + 1;
+             var current_slider_value = i;
+             slider_remaining = month_counter - i;
+             //set new slider value
+             document.getElementById('slider').value = current_slider_value
+             //map.setFilter('collisions', ['==', ['number', ['get', 'time_id']], current_slider_value]);
+             map.setFilter('heat_layer', ['==', ['get', 'time_id'], current_slider_value]);
+             document.getElementById('active-hour').innerText = current_slider_value;
+             console.log(slider_remaining);
+             i++;
          } //end of else
        }, movement_speed);
+
+       document.getElementById("one_month_jump").disabled = false;
 
 
 
@@ -210,6 +218,9 @@
       document.getElementById("pause_button").addEventListener("click", function(){
         console.log("pressed pause")
         clearInterval(intervalId)
+        clearInterval(month_intervalId)
+        document.getElementById("one_month_jump").disabled = false;
+        document.getElementById("play_button").disabled = false;
 
       });
 
@@ -217,10 +228,15 @@
         console.log("pressed play")
 
 
+
         intervalId = setInterval(function(){
+
+          document.getElementById("play_button").disabled = true;
+
            if(i === 539){
               clearInterval(intervalId);
               i = 0;
+              document.getElementById("play_button").disabled = false;
               //reset slider to 0 hour
            }
 
@@ -273,10 +289,15 @@
               property: "hot",
               type: "exponential",
               stops: [
-                [{zoom: 8, value: 0}, 4],
-                [{zoom: 8, value: 16}, 50],
-                [{zoom: 14, value: 0}, 8],
-                [{zoom: 14, value: 16}, 20],
+                [{zoom: 5, value: 0}, 4],
+                [{zoom: 5, value: 5}, 30],
+                [{zoom: 5, value: 16}, 100],
+                [{zoom: 8, value: 0}, 16],
+                [{zoom: 8, value: 5}, 60],
+                [{zoom: 8, value: 16}, 200],
+                [{zoom: 14, value: 0}, 32],
+                [{zoom: 14, value: 5}, 100],
+                [{zoom: 14, value: 16}, 300]
               ]
             },
             "circle-color": 'rgba(202,0,32,0.3)'
@@ -285,22 +306,58 @@
 
         //add event listener for slider here?
 
+        // updates slider value instantly
         document.getElementById('slider').addEventListener('input', function(e) {
           var hour = parseInt(e.target.value);
-          // update the map
-          map.setFilter('heat_layer', ['==', ['number', ['get', 'time_id']], hour]);
-
           i = hour;
-          // converting 0-23 hour to AMPM format
-          //var ampm = hour >= 12 ? 'PM' : 'AM';
-          //var hour12 = hour % 12 ? hour % 12 : 12;
 
           // update text in the UI
-          //document.getElementById('active-hour').innerText = hour12 + ampm;
           document.getElementById('active-hour').innerText = hour;
         });
 
+        // filters map once the slider values has changed
+        document.getElementById('slider').addEventListener('change', function(e) {
+          var hour = parseInt(e.target.value);
+          i = hour;
+          // update the map
+          console.log("Update by slider")
+          map.setFilter('heat_layer', ['==', ['number', ['get', 'time_id']], hour]);
+
+        });
+
       }); //This ends map on function
+
+      var popup = new mapboxgl.Popup({
+          closeButton: false,
+          closeOnClick: false
+      });
+
+      map.on('mouseenter', 'heat_layer', function(e) {
+          // Change the cursor style as a UI indicator.
+          map.getCanvas().style.cursor = 'pointer';
+          console.log("entered")
+          var coordinates = e.features[0].geometry.coordinates.slice();
+          var description = '<b>City:</b> ' + e.features[0].properties.city1 + '<b><br/>Date:</b> ' + e.features[0].properties.time;
+          console.log(description)
+          // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          //while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          //coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          //}
+
+          // Populate the popup and set its coordinates
+          // based on the feature found.
+      popup
+          .setLngLat(coordinates)
+          .setHTML(description)
+          .addTo(map);
+      });
+
+      map.on('mouseleave', 'heat_layer', function() {
+          map.getCanvas().style.cursor = '';
+          popup.remove();
+      });
 
 
     </script>
