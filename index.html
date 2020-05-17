@@ -246,7 +246,6 @@
 
            //set new slider value
            document.getElementById('slider').value = current_slider_value
-           //map.setFilter('collisions', ['==', ['number', ['get', 'time_id']], current_slider_value]);
            map.setFilter('heat_layer', ['==', ['get', 'time_id'], current_slider_value]);
            document.getElementById('active-hour').innerText = current_slider_value;
            console.log("New slider value was set - yay :)")
@@ -304,28 +303,32 @@
           }
         },'waterway-label');
 
-        //add event listener for slider here?
-
-        // updates slider value instantly
-        document.getElementById('slider').addEventListener('input', function(e) {
-          var hour = parseInt(e.target.value);
-          i = hour;
-
-          // update text in the UI
-          document.getElementById('active-hour').innerText = hour;
+        //default filter value
+        map.setFilter('heat_layer', ['==', ['number', ['get', 'time_id']], parseInt(document.getElementById('slider').value)]);
         });
 
-        // filters map once the slider values has changed
-        document.getElementById('slider').addEventListener('change', function(e) {
-          var hour = parseInt(e.target.value);
-          i = hour;
-          // update the map
-          console.log("Update by slider")
-          map.setFilter('heat_layer', ['==', ['number', ['get', 'time_id']], hour]);
 
-        });
 
-      }); //This ends map on function
+
+      // updates slider value instantly
+      document.getElementById('slider').addEventListener('input', function(e) {
+        var hour = parseInt(e.target.value);
+        i = hour;
+
+        // update text in the UI
+        document.getElementById('active-hour').innerText = hour;
+      });
+
+      // filters map once the slider values has changed
+      document.getElementById('slider').addEventListener('change', function(e) {
+        var hour = parseInt(e.target.value);
+        i = hour;
+        // update the map
+        console.log("Update by slider")
+        map.setFilter('heat_layer', ['==', ['number', ['get', 'time_id']], hour]);
+      });
+
+
 
       var popup = new mapboxgl.Popup({
           closeButton: false,
@@ -339,15 +342,7 @@
           var coordinates = e.features[0].geometry.coordinates.slice();
           var description = '<b>City:</b> ' + e.features[0].properties.city1 + '<b><br/>Date:</b> ' + e.features[0].properties.time;
           console.log(description)
-          // Ensure that if the map is zoomed out such that multiple
-          // copies of the feature are visible, the popup appears
-          // over the copy being pointed to.
-          //while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          //coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-          //}
 
-          // Populate the popup and set its coordinates
-          // based on the feature found.
       popup
           .setLngLat(coordinates)
           .setHTML(description)
