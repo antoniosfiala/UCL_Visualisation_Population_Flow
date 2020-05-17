@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>NYC vehicle collisions</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+
+      h1 {
+        font-size: 20px;
+        line-height: 30px;
+      }
+
+      h2 {
+        font-size: 14px;
+        line-height: 20px;
+        margin-bottom: 10px;
+      }
+
+      a {
+        text-decoration: none;
+        color: #2dc4b2;
+      }
+
+      #console {
+        position: absolute;
+        width: 240px;
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: white;
+      }
+
+      .session {
+        margin-bottom: 20px;
+      }
+
+      .row {
+        height: 12px;
+        width: 100%;
+      }
+
+      .colors {
+        background: linear-gradient(
+          to right,
+          #2dc4b2,
+          #3bb3c3,
+          #669ec4,
+          #8b88b6,
+          #a2719b,
+          #aa5e79
+        );
+        margin-bottom: 5px;
+      }
+
+      .label {
+        width: 15%;
+        display: inline-block;
+        text-align: center;
+      }
+      <!STYLE SHEET FOR PLAY/PAUSE BUTTON>
+      button {
+      position: absolute;
+      margin: 20px;
+      }
+
+      #play {
+      content: 'Play';
+      }
+
+      #pause {
+      content: 'Pause';
+      }
+
+      #one_month_jump {
+      content: 'Month jump';
+      }
+
+
+
+
+    </style>
+  </head>
+
+  <body>
+
+    <div id="map"></div>
+
+    <div id="console">
+      <h1>Motor vehicle collisions</h1>
+      <p>
+        Data:
+        <a
+          href="https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95"
+          >Motor vehicle collision injuries and death</a
+        >
+        in NYC, Jan 2016
+      </p>
+      <div class="session">
+        <h2>Casualty</h2>
+        <div class="row colors"></div>
+        <div class="row labels">
+          <div class="label">0</div>
+          <div class="label">1</div>
+          <div class="label">2</div>
+          <div class="label">3</div>
+          <div class="label">4</div>
+          <div class="label">5+</div>
+        </div>
+      </div>
+
+      <div class='session' id='sliderbar'>
+        <h2>Day: <label id='active-hour'>0</label></h2>
+        <input id='slider' class='row' type='range' min='0' max='539' step='1' value='0' />
+      </div>
+
+      <button id="play_button"><p>Play</p></button>
+      <button id="pause_button"><p>Pause</p></button>
+      <button id="one_month_jump"><p>Month jump</p></button>
+
+
+
+    </div>
+
+
+
+
+    <script>
+
+    var tiles_china_cities = "mapbox://antoniosfiala.2t2rk5dl";
+    var tiles_china_cities_layer = "china_cities_full-2fhf8t"
+    //BUTTON CODE
+
+      // timer object
+      var intervalId;
+      var movement_speed = 500;
+      //var i = 0;
+      var i = 0;
+      var month_counter = 0
+
+      function f_next_time_step(){
+
+        var date_now = new Date();
+        var time_now = date_now.getTime();
+        console.log(time_now);
+
+        //var pretend_hour = pretend_hour + 1
+      }
+
+      function myTimer(){
+        var d = new Date();
+        var t = d.toLocaleTimeString();
+        console.log(t)
+      }
+
+      document.getElementById("one_month_jump").addEventListener("click", function(){
+        console.log("going to move one month jump")
+
+        month_counter = i + 30
+
+        intervalId = setInterval(function(){
+           if(i === 539){
+              clearInterval(intervalId);
+              i = 0;
+              //reset slider to 0 hour
+           } else if (i === month_counter) {
+             clearInterval(intervalId);
+             month_counter = 0;
+           } else {
+
+           // increment slider
+           //var current_slider_value = parseInt(document.getElementById('slider').value) + 1;
+           var current_slider_value = i
+           //set new slider value
+           document.getElementById('slider').value = current_slider_value
+           //map.setFilter('collisions', ['==', ['number', ['get', 'time_id']], current_slider_value]);
+           map.setFilter('heat_layer', ['==', ['get', 'time_id'], current_slider_value]);
+           document.getElementById('active-hour').innerText = current_slider_value;
+           console.log("MONTH: || New slider value was set - yay :)")
+
+           console.log(month_counter - i);
+           i++;
+         } //end of else
+       }, movement_speed);
+
+
+
+      });
+
+      document.getElementById("pause_button").addEventListener("click", function(){
+        console.log("pressed pause")
+        clearInterval(intervalId)
+
+      });
+
+      document.getElementById("play_button").addEventListener("click", function(){
+        console.log("pressed play")
+
+
+        intervalId = setInterval(function(){
+           if(i === 539){
+              clearInterval(intervalId);
+              i = 0;
+              //reset slider to 0 hour
+           }
+
+           // increment slider
+           //var current_slider_value = parseInt(document.getElementById('slider').value) + 1;
+           var current_slider_value = i
+
+           //set new slider value
+           document.getElementById('slider').value = current_slider_value
+           //map.setFilter('collisions', ['==', ['number', ['get', 'time_id']], current_slider_value]);
+           map.setFilter('heat_layer', ['==', ['get', 'time_id'], current_slider_value]);
+           document.getElementById('active-hour').innerText = current_slider_value;
+           console.log("New slider value was set - yay :)")
+
+           console.log(i);
+           console.log(typeof i);
+           i++;
+        }, movement_speed);
+
+
+      });
+
+      mapboxgl.accessToken =
+        'pk.eyJ1IjoiYW50b25pb3NmaWFsYSIsImEiOiJjazduaWNyMDMwMndnM3NtdHMwY2Jya2s1In0.v4PaAiRVs6h3h7lNNfjZqw';
+
+
+      // This adds the map to your page
+      var map = new mapboxgl.Map({
+        container: 'map', // container id specified in the HTML
+        style: 'mapbox://styles/antoniosfiala/ck7hwy44f51od1iodg0d0um6u',
+        //style: 'mapbox://styles/mapbox/light-v10', // style URL
+        center: [112.076755,30.795638], // initial map center in [lon, lat]
+        zoom: 6
+      });
+
+      map.on('load', function() {
+
+        map.addSource("china_cities", {
+          type: "vector",
+          url: tiles_china_cities
+        });
+
+        map.addLayer({
+          "id": "heat_layer",
+          "type": "circle",
+          "source": "china_cities",
+          "source-layer": tiles_china_cities_layer,
+          "paint": {
+            "circle-radius": {
+              property: "hot",
+              type: "exponential",
+              stops: [
+                [{zoom: 8, value: 0}, 4],
+                [{zoom: 8, value: 16}, 50],
+                [{zoom: 14, value: 0}, 8],
+                [{zoom: 14, value: 16}, 20],
+              ]
+            },
+            "circle-color": 'rgba(202,0,32,0.3)'
+          }
+        },'waterway-label');
+
+        //add event listener for slider here?
+
+        document.getElementById('slider').addEventListener('input', function(e) {
+          var hour = parseInt(e.target.value);
+          // update the map
+          map.setFilter('heat_layer', ['==', ['number', ['get', 'time_id']], hour]);
+
+          i = hour;
+          // converting 0-23 hour to AMPM format
+          //var ampm = hour >= 12 ? 'PM' : 'AM';
+          //var hour12 = hour % 12 ? hour % 12 : 12;
+
+          // update text in the UI
+          //document.getElementById('active-hour').innerText = hour12 + ampm;
+          document.getElementById('active-hour').innerText = hour;
+        });
+
+      }); //This ends map on function
+
+
+    </script>
+  </body>
+</html>
