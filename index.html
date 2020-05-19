@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>NYC vehicle collisions</title>
+    <title>Project 3: China internal migration</title>
     <meta name="robots" content="noindex, nofollow" />
     <meta
       name="viewport"
@@ -48,7 +48,8 @@
         width: 240px;
         margin: 10px;
         padding: 10px 20px;
-        background-color: white;
+
+        background: rgba(255, 255, 255, 0.7);
       }
 
       .session {
@@ -78,26 +79,27 @@
         display: inline-block;
         text-align: center;
       }
-      <!STYLE SHEET FOR PLAY/PAUSE BUTTON>
-      button {
-      position: absolute;
-      margin: 20px;
-      }
+      .button {
+          position: relative;
+          width: 10%;
+          height: 20px;
+          margin-bottom: 0%;
+          margin-top: 0%;
+          text-align: center
+          display: inline-block;
+          line-height: 0px;
 
-      #play {
-      content: 'Play';
-      }
+        }
 
-      #pause {
-      content: 'Pause';
-      }
+      /*.button {
+          background-color: rgba(255, 255, 255, 0.9);
+          color: gray;
+          border-radius: 4px;
+          width: 45%;
+          height: 40px;
 
-      #one_month_jump {
-      content: 'Month jump';
-      }
-
-
-
+          outline: none;
+      }*/
 
     </style>
   </head>
@@ -107,254 +109,387 @@
     <div id="map"></div>
 
     <div id="console">
-      <h1>Motor vehicle collisions</h1>
+      <h1>Project 3 | <br>Intensity of domestic movement</h1>
       <p>
         Data:
         <a
           href="https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95"
-          >Motor vehicle collision injuries and death</a
+          >Insert data source here</a
         >
-        in NYC, Jan 2016
+        Jan 2018 - June 2019
       </p>
       <div class="session">
-        <h2>Casualty</h2>
+        <h2>Individuals moving</h2>
         <div class="row colors"></div>
         <div class="row labels">
-          <div class="label">0</div>
-          <div class="label">1</div>
-          <div class="label">2</div>
-          <div class="label">3</div>
-          <div class="label">4</div>
-          <div class="label">5+</div>
+          <div class="label" id ="legend_min">0</div>
+          <div class="label">a</div>
+          <div class="label">b</div>
+          <div class="label">c</div>
+          <div class="label">d</div>
+          <div class="label" id = "legend_max">Xm+</div>
         </div>
       </div>
 
+      <!Drop down menu code>
+      <label for ="time_select"> Select temporal resolution</label>
+      <select id = "time_select">
+        <option value = "monthly">Monthly</option>
+        <option value = "weekly">Weekly</option>
+        <option value = "daily">Daily</option>
+      </select>
+      <script id = "drop_down_code">
+        // placeholder value
+        var drop_value = "monthly";
+
+        // listener to update drop-down variable
+        document.getElementById("time_select").addEventListener("change", function(e)
+        { // store new value
+          drop_value = e.target.value;
+          // update slider values
+          if (drop_value === "monthly"){ // update max value and inner text for slider MONTH
+            // slider code
+              slider_max = 17;
+              slider_input.max = slider_max;
+              slider_heading.innerText = "Month: ";
+              // set slider to the start
+              slider_heading_report.textContent = 0; slider_input.value = 0; slider_value = 0;
+            // layer code
+              map.setLayoutProperty(map_layer_id[0], 'visibility', 'visible');
+              map.setLayoutProperty(map_layer_id[1], 'visibility', 'none');
+              map.setLayoutProperty(map_layer_id[2], 'visibility', 'none');
+              current_layer = map_layer_id[0];
+              f_pop_ups();
+          } else if (drop_value == "weekly"){ // update max value and inner text for slider WEEK
+            // slider code
+              slider_max = 76;
+              slider_input.max = slider_max;
+              slider_heading.innerText = "Week: ";
+              // set slider to the start
+              slider_heading_report.textContent = 0; slider_input.value = 0; slider_value = 0;
+            // layer code
+              map.setLayoutProperty(map_layer_id[0], 'visibility', 'none');
+              map.setLayoutProperty(map_layer_id[1], 'visibility', 'visible');
+              map.setLayoutProperty(map_layer_id[2], 'visibility', 'none');
+              current_layer = map_layer_id[1];
+              f_pop_ups();
+          } else if (drop_value == "daily"){ // update max value and inner text for slider DAY
+            // slider code
+              slider_max = 539;
+              slider_input.max = slider_max;
+              slider_heading.innerText = "Day: ";
+              // set slider to the start
+              slider_heading_report.textContent = 0; slider_input.value = 0; slider_value = 0;
+            // layer code
+              map.setLayoutProperty(map_layer_id[0], 'visibility', 'none');
+              map.setLayoutProperty(map_layer_id[1], 'visibility', 'none');
+              map.setLayoutProperty(map_layer_id[2], 'visibility', 'visible');
+              current_layer = map_layer_id[2];
+              f_pop_ups();
+          } else {
+            console.log("Assigning slider values based on dropdown | \nError, something went horribly wrong.")
+          };
+          });
+      </script>
+
+      <button type ="button" class="button" id="play_button"><p>▶</p></button>
+      <button type ="button" class="button" id="pause_button"><p>||</p></button>
+      <button type ="button" class="button" id="restart_button"><p>↺</p></button>
+
+      <!Slider bar>
       <div class='session' id='sliderbar'>
-        <h2>Day: <label id='active-hour'>0</label></h2>
-        <input id='slider' class='row' type='range' min='0' max='539' step='1' value='0' />
+        <h2><label id="slider_label">Month: </label><label id="slider_value_text">2018-01-31</label></h2>
+            <input id="slider" class="row" type="range" min="0" max="17" step="1" value="0"/>
       </div>
+      <script id = "slider_code">
+        var slider_min = 0;
+        var slider_starter_value = slider_min;
+        var slider_max = 17;
+        var slider_value = document.getElementById("slider").value;
+        var slider_input = document.getElementById("slider");
+        var slider_heading = document.getElementById("slider_label");
+        var slider_heading_report = document.getElementById("slider_value_text");
 
-      <button id="play_button"><p>Play</p></button>
-      <button id="pause_button"><p>Pause</p></button>
-      <button id="one_month_jump"><p>Month jump</p></button>
+        // List of dates
+        var list_month = ["2018-01-31","2018-02-28","2018-03-31","2018-04-30","2018-05-31",
+                      "2018-06-30","2018-07-31","2018-08-31","2018-09-30","2018-10-31",
+                      "2018-11-30","2018-12-31","2019-01-31","2019-02-28","2019-03-31",
+                      "2019-04-30","2019-05-31","2019-06-30"]
 
-
+        // updates slider value instantly
+        document.getElementById('slider').addEventListener('input', function(e) {
+          slider_value = parseInt(e.target.value);
+          slider_heading_report.textContent = list_month[slider_value];
+        });
+      </script>
 
     </div>
 
-
-
-
+    <!ELEMENT VISABILITY>
     <script>
+      // set button visability
+      //document.getElementById("play_button").hidden = false;
+      //document.getElementById("pause_button").hidden = true;
+    </script>
 
-    var tiles_china_cities = "mapbox://antoniosfiala.2t2rk5dl";
-    var tiles_china_cities_layer = "china_cities_full-2fhf8t"
-    //BUTTON CODE
+    <!DATA IMPORT and VARIABLES>
+    <script>
+      // Data
+      var tiles_china_monthly = ["mapbox://antoniosfiala.01elxjk1","china_cities_monthly-83ax5v"];
+      var tiles_china_weekly =  ["mapbox://antoniosfiala.1t44b6r6","china_cities_weekly-6ypqt8"];
+      var tiles_china_daily =   ["mapbox://antoniosfiala.dejrhd3d","china_cities_daily-diopt6"];
+      var tiles_pure_names = ["antoniosfiala.01elxjk1","antoniosfiala.1t44b6r6","antoniosfiala.dejrhd3d"];
+      var tiles_all = [tiles_china_monthly,tiles_china_weekly,tiles_china_daily];
+
+      var map_source_name = ["china_cities_monthly","china_cities_weekly","china_cities_daily"];
+      var map_layer_id = ["layer_city_month","layer_city_week","layer_city_day"]
+
+      // Mapping
+      var access_token = 'pk.eyJ1IjoiYW50b25pb3NmaWFsYSIsImEiOiJjazduaWNyMDMwMndnM3NtdHMwY2Jya2s1In0.v4PaAiRVs6h3h7lNNfjZqw';
+
+      // Layer manipulation (start at 0)
+      var current_layer = map_layer_id[0];
 
       // timer object
       var intervalId;
+      var month_intervalId;
       var movement_speed = 500;
       //var i = 0;
-      var i = 0;
+
       var month_counter = 0
       var slider_remaining;
       var month_jumps = 30
 
-      function f_next_time_step(){
 
-        var date_now = new Date();
-        var time_now = date_now.getTime();
-        console.log(time_now);
+    </script>
 
-        //var pretend_hour = pretend_hour + 1
-      }
+    <!MAP CODE>
+    <script id= "Map load">
+      // Mapbox token
 
-      function myTimer(){
-        var d = new Date();
-        var t = d.toLocaleTimeString();
-        console.log(t)
-      }
+      mapboxgl.accessToken = access_token;
 
-      document.getElementById("one_month_jump").addEventListener("click", function(){
-        console.log("going to move one month jump")
-
-
-        month_counter = i + month_jumps
-
-        month_intervalId = setInterval(function(){
-          document.getElementById("one_month_jump").disabled = true;
-           if(i === 539){
-              clearInterval(month_intervalId);
-              i = 0;
-              document.getElementById("one_month_jump").disabled = false;
-              //reset slider to 0 hour
-           } else if (slider_remaining <= 0){
-             console.log("less than 0");
-             clearInterval(month_intervalId);
-             month_counter = i + month_jumps
-             slider_remaining = month_counter;
-             document.getElementById("one_month_jump").disabled = false;
-           } else {
-             // increment slider
-             //var current_slider_value = parseInt(document.getElementById('slider').value) + 1;
-             var current_slider_value = i;
-             slider_remaining = month_counter - i;
-             //set new slider value
-             document.getElementById('slider').value = current_slider_value
-             //map.setFilter('collisions', ['==', ['number', ['get', 'time_id']], current_slider_value]);
-             map.setFilter('heat_layer', ['==', ['get', 'time_id'], current_slider_value]);
-             document.getElementById('active-hour').innerText = current_slider_value;
-             console.log(slider_remaining);
-             i++;
-         } //end of else
-       }, movement_speed);
-
-       document.getElementById("one_month_jump").disabled = false;
-
-
-
-      });
-
-      document.getElementById("pause_button").addEventListener("click", function(){
-        console.log("pressed pause")
-        clearInterval(intervalId)
-        clearInterval(month_intervalId)
-        document.getElementById("one_month_jump").disabled = false;
-        document.getElementById("play_button").disabled = false;
-
-      });
-
-      document.getElementById("play_button").addEventListener("click", function(){
-        console.log("pressed play")
-
-
-
-        intervalId = setInterval(function(){
-
-          document.getElementById("play_button").disabled = true;
-
-           if(i === 539){
-              clearInterval(intervalId);
-              i = 0;
-              document.getElementById("play_button").disabled = false;
-              //reset slider to 0 hour
-           }
-
-           // increment slider
-           //var current_slider_value = parseInt(document.getElementById('slider').value) + 1;
-           var current_slider_value = i
-
-           //set new slider value
-           document.getElementById('slider').value = current_slider_value
-           map.setFilter('heat_layer', ['==', ['get', 'time_id'], current_slider_value]);
-           document.getElementById('active-hour').innerText = current_slider_value;
-           console.log("New slider value was set - yay :)")
-
-           console.log(i);
-           console.log(typeof i);
-           i++;
-        }, movement_speed);
-
-
-      });
-
-      mapboxgl.accessToken =
-        'pk.eyJ1IjoiYW50b25pb3NmaWFsYSIsImEiOiJjazduaWNyMDMwMndnM3NtdHMwY2Jya2s1In0.v4PaAiRVs6h3h7lNNfjZqw';
-
-
-      // This adds the map to your page
+      // Map and style
       var map = new mapboxgl.Map({
         container: 'map', // container id specified in the HTML
         style: 'mapbox://styles/antoniosfiala/ck7hwy44f51od1iodg0d0um6u',
-        //style: 'mapbox://styles/mapbox/light-v10', // style URL
-        center: [112.076755,30.795638], // initial map center in [lon, lat]
-        zoom: 6
+        center: [100,35], // initial map center in [lon, lat]
+        zoom: 2.7 //this way we can see all of China
       });
 
-      map.on('load', function() {
+      map.on('load', function(){
+        // Three sources
+        map.addSource(map_source_name[0], {type: "vector",url: tiles_all[0][0]});
+        map.addSource(map_source_name[1], {type: "vector",url: tiles_all[1][0]});
+        map.addSource(map_source_name[2], {type: "vector",url: tiles_all[2][0], minzoom: 2});
 
-        map.addSource("china_cities", {
-          type: "vector",
-          url: tiles_china_cities
-        });
-
+        // MONTHLY LAYER map_source_name[0]
         map.addLayer({
-          "id": "heat_layer",
-          "type": "circle",
-          "source": "china_cities",
-          "source-layer": tiles_china_cities_layer,
+          // identifier and type
+          "id": map_layer_id[0], "type": "circle","source": map_source_name[0],"source-layer":tiles_all[0][1],
           "paint": {
             "circle-radius": {
-              property: "hot",
+              property: "hot_manual",
               type: "exponential",
               stops: [
-                [{zoom: 5, value: 0}, 4],
-                [{zoom: 5, value: 5}, 30],
-                [{zoom: 5, value: 16}, 100],
+                [{zoom: 0, value: 28}, 1],
+                [{zoom: 0, value: 40}, 2],
+                [{zoom: 0, value: 70}, 4],
+                [{zoom: 5, value: 28}, 1],
+                [{zoom: 5, value: 40}, 10],
+                [{zoom: 5, value: 70}, 30],
                 [{zoom: 8, value: 0}, 16],
-                [{zoom: 8, value: 5}, 60],
-                [{zoom: 8, value: 16}, 200],
+                [{zoom: 8, value: 30}, 60],
+                [{zoom: 8, value: 60}, 200],
                 [{zoom: 14, value: 0}, 32],
                 [{zoom: 14, value: 5}, 100],
                 [{zoom: 14, value: 16}, 300]
               ]
             },
-            "circle-color": 'rgba(202,0,32,0.3)'
-          }
+            "circle-color": {
+              property: "hot_manual",
+              type: "exponential",
+              stops: [
+                [{zoom: 0,  value: 28},"rgba(5,113,176,0.4)"],
+                [{zoom: 0,  value: 40},"rgba(244,165,130,0.4)"],
+                [{zoom: 0,  value: 70},"rgba(202,0,32,0.4)"]
+              ]},
+          } //end of painting
         },'waterway-label');
 
+        // WEEKLY LAYER map_source_name[1]
+        map.addLayer({
+          // identifier and type
+          "id": map_layer_id[1], "type": "circle","source": map_source_name[1],"source-layer":tiles_all[1][1],
+          "paint": {
+            "circle-radius": {
+              property: "hot_manual",
+              type: "exponential",
+              stops: [
+                [{zoom: 0, value: 7}, 1],
+                [{zoom: 0, value: 9}, 2],
+                [{zoom: 0, value: 16}, 4],
+                [{zoom: 15, value: 7}, 10],
+                [{zoom: 15, value: 9}, 20],
+                [{zoom: 15, value: 16}, 40]
+              ]
+            },
+            "circle-color": {
+              property: "hot_manual",
+              type: "exponential",
+              stops: [
+                [{zoom: 0,  value: 7},"rgba(5,113,176,0.4)"],
+                [{zoom: 0,  value: 9},"rgba(244,165,130,0.4)"],
+                [{zoom: 0,  value: 16},"rgba(202,0,32,0.4)"]
+              ]},
+          } //end of painting
+        },'waterway-label');
+
+        // DAILY LAYER map_source_name[2]
+        map.addLayer({
+          // identifier and type
+          "id": map_layer_id[2], "type": "circle","source": map_source_name[2],"source-layer":tiles_all[2][1],
+          "paint": {
+            "circle-radius": {
+              property: "hot_manual",
+              type: "exponential",
+              stops: [
+                [{zoom: 0, value: 1.25}, 1],
+                [{zoom: 0, value: 1.3}, 2],
+                [{zoom: 0, value: 2.5}, 4],
+                [{zoom: 15, value: 1.25}, 32],
+                [{zoom: 15, value: 1.3}, 100],
+                [{zoom: 15, value: 2.5}, 300]
+              ]
+            },
+            "circle-color": {
+              property: "hot_manual",
+              type: "exponential",
+              stops: [
+                [{zoom: 0,  value: 1.25},"rgba(5,113,176,0.4)"],
+                [{zoom: 0,  value: 1.3},"rgba(244,165,130,0.4)"],
+                [{zoom: 0,  value: 2.5},"rgba(202,0,32,0.4)"]
+              ]},
+          } //end of painting
+        },'waterway-label');
+
+        // HIDE/SHOW DEFAULT
+        map.setLayoutProperty(map_layer_id[0], 'visibility', 'visible');
+        map.setLayoutProperty(map_layer_id[1], 'visibility', 'none');
+        map.setLayoutProperty(map_layer_id[2], 'visibility', 'none');
+
         //default filter value
-        map.setFilter('heat_layer', ['==', ['number', ['get', 'time_id']], parseInt(document.getElementById('slider').value)]);
+        //add conditional
+        map.setFilter(map_layer_id[0], ['==', ['number', ['get', 'time_id']], parseInt(slider_value)]);
+        map.setFilter(map_layer_id[1], ['==', ['number', ['get', 'time_id']], parseInt(slider_value)]);
+        map.setFilter(map_layer_id[2], ['==', ['number', ['get', 'time_id']], parseInt(slider_value)]);
+      });
+    </script>
+
+    <!THIS IS WHERE THE BUTTONS WORK>
+    <script id = "buttons_actions">
+        // filters map once the slider values has changed
+        document.getElementById('slider').addEventListener('change', function(e) {
+          slider_value = parseInt(e.target.value);
+          // update the map
+          //console.log("Update by slider")
+          map.setFilter(current_layer, ['==', ['number', ['get', 'time_id']], slider_value]);
         });
 
+        // PLAY BUTTON
+        document.getElementById("play_button").addEventListener("click", function(){
+          intervalId = setInterval(function(){
 
+            document.getElementById("play_button").disabled = true;
+            document.getElementById("play_button").hidden = true;
+            document.getElementById("pause_button").hidden = false;
 
+             if(parseInt(slider_value) === parseInt(slider_max)){
+                clearInterval(intervalId);
+                slider_value = 0;
+                document.getElementById("play_button").disabled = false;
+                f_stop_play();
+                //reset slider to 0 hour
+             }
 
-      // updates slider value instantly
-      document.getElementById('slider').addEventListener('input', function(e) {
-        var hour = parseInt(e.target.value);
-        i = hour;
+             //set new slider value
+             document.getElementById('slider').value = slider_value;
+             map.setFilter(current_layer, ['==', ['get', 'time_id'], slider_value]);
+             slider_heading_report.textContent = slider_value;
+             console.log("New slider value was set - yay :)");
+             slider_value++;
+          }, movement_speed);
+        });
+        // PAUSE BUTTON
+        document.getElementById("pause_button").addEventListener("click", function(){
+          //console.log("pressed pause")
+          clearInterval(intervalId)
+          document.getElementById("play_button").disabled = false;
+          document.getElementById("play_button").hidden = false;
+          document.getElementById("pause_button").hidden = true;
+        });
 
-        // update text in the UI
-        document.getElementById('active-hour').innerText = hour;
+        document.getElementById("restart_button").addEventListener("click", function(){
+          slider_value = 0;
+          slider_input.value = 0;
+          slider_heading_report.textContent = slider_value;
+        });
+
+    </script>
+
+    <!MAP MOUSE ACTIONS AND POP UPS>
+    <script id= "MAP INTERACTIVITY">
+
+      function f_pop_ups(){
+        // Create pop-up
+        var popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false
+        });
+        // Action when we enter layer
+        map.on('mouseenter', current_layer, function(e) {
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+            console.log("entered")
+            console.log(e)
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = '<b>City:</b> ' + e.features[0].properties.city1 + '<b><br/>Date:</b> ' + e.features[0].properties.time;
+            console.log(description)
+        popup
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
+        });
+        // Action when we leave layer
+        map.on('mouseleave', current_layer, function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+      };
+
+      // The sourcedata event is an example of MapDataEvent.
+      // Set up an event listener on the map.
+      map.on('sourcedata', function(e) {
+         if (e.isSourceLoaded) {
+             console.log(current_layer,"loaded!!");// Do something when the source has finished loading
+             //var temp_data = e.features[0].properties.time;
+             //console.log(e);
+             //console.log(temp_data);
+
+         }
       });
 
-      // filters map once the slider values has changed
-      document.getElementById('slider').addEventListener('change', function(e) {
-        var hour = parseInt(e.target.value);
-        i = hour;
-        // update the map
-        console.log("Update by slider")
-        map.setFilter('heat_layer', ['==', ['number', ['get', 'time_id']], hour]);
-      });
+      //run above on load
+      f_pop_ups();
 
+      // Stopped playing
+      function f_stop_play(){
+        document.getElementById("play_button").hidden = false;
+        document.getElementById("pause_button").hidden = true;
+      };
 
-
-      var popup = new mapboxgl.Popup({
-          closeButton: false,
-          closeOnClick: false
-      });
-
-      map.on('mouseenter', 'heat_layer', function(e) {
-          // Change the cursor style as a UI indicator.
-          map.getCanvas().style.cursor = 'pointer';
-          console.log("entered")
-          var coordinates = e.features[0].geometry.coordinates.slice();
-          var description = '<b>City:</b> ' + e.features[0].properties.city1 + '<b><br/>Date:</b> ' + e.features[0].properties.time;
-          console.log(description)
-
-      popup
-          .setLngLat(coordinates)
-          .setHTML(description)
-          .addTo(map);
-      });
-
-      map.on('mouseleave', 'heat_layer', function() {
-          map.getCanvas().style.cursor = '';
-          popup.remove();
-      });
-
-
+      f_stop_play();
+      
     </script>
   </body>
 </html>
