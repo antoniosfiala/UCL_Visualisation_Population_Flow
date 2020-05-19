@@ -38,10 +38,10 @@
         margin-bottom: 10px;
       }
 
-      a {
+      /*a {
         text-decoration: none;
         color: #2dc4b2;
-      }
+      }*/
 
       #console {
         position: absolute;
@@ -49,7 +49,7 @@
         margin: 10px;
         padding: 10px 20px;
 
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.9);
       }
 
       .session {
@@ -61,15 +61,18 @@
         width: 100%;
       }
 
+/*
+[{zoom: 0,  value: 28},"rgba(5,113,176,0.4)"],
+[{zoom: 0,  value: 40},"rgba(244,165,130,0.4)"],
+[{zoom: 0,  value: 70},"rgba(202,0,32,0.4)"]
+*/
+
       .colors {
         background: linear-gradient(
           to right,
-          #2dc4b2,
-          #3bb3c3,
-          #669ec4,
-          #8b88b6,
-          #a2719b,
-          #aa5e79
+          rgba(5,113,176,0.4),
+          rgba(244,165,130,0.4),
+          rgba(202,0,32,0.4)
         );
         margin-bottom: 5px;
       }
@@ -111,10 +114,10 @@
     <div id="console">
       <h1>Project 3 | <br>Intensity of domestic movement</h1>
       <p>
-        Data:
+        Data (purchased):
         <a
-          href="https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95"
-          >Insert data source here</a
+          href="https://heat.qq.com"
+          >Tencent Holdings Ltd</a
         >
         Jan 2018 - June 2019
       </p>
@@ -122,12 +125,12 @@
         <h2>Individuals moving</h2>
         <div class="row colors"></div>
         <div class="row labels">
-          <div class="label" id ="legend_min">0</div>
-          <div class="label">a</div>
-          <div class="label">b</div>
-          <div class="label">c</div>
-          <div class="label">d</div>
-          <div class="label" id = "legend_max">Xm+</div>
+          <div class="label" id ="legend_min">0.1m</div>
+          <div class="label"></div>
+          <div class="label"></div>
+          <div class="label"></div>
+          <div class="label"></div>
+          <div class="label" id = "legend_max">35m+</div>
         </div>
       </div>
 
@@ -153,39 +156,54 @@
               slider_input.max = slider_max;
               slider_heading.innerText = "Month: ";
               // set slider to the start
-              slider_heading_report.textContent = 0; slider_input.value = 0; slider_value = 0;
+              slider_ref_values = list_month;
+              slider_heading_report.textContent = slider_ref_values[0]; slider_input.value = 0; slider_value = 0;
             // layer code
               map.setLayoutProperty(map_layer_id[0], 'visibility', 'visible');
               map.setLayoutProperty(map_layer_id[1], 'visibility', 'none');
               map.setLayoutProperty(map_layer_id[2], 'visibility', 'none');
               current_layer = map_layer_id[0];
               f_pop_ups();
+
+            // legend code
+            document.getElementById("legend_min").innerHTML = layer_min_max[0][0];
+            document.getElementById("legend_max").innerHTML = layer_min_max[0][1];
+
           } else if (drop_value == "weekly"){ // update max value and inner text for slider WEEK
             // slider code
               slider_max = 76;
               slider_input.max = slider_max;
-              slider_heading.innerText = "Week: ";
+              slider_heading.innerText = "Week of: ";
               // set slider to the start
-              slider_heading_report.textContent = 0; slider_input.value = 0; slider_value = 0;
+              slider_ref_values = list_week;
+              slider_heading_report.textContent = slider_ref_values[0]; slider_input.value = 0; slider_value = 0;
             // layer code
               map.setLayoutProperty(map_layer_id[0], 'visibility', 'none');
               map.setLayoutProperty(map_layer_id[1], 'visibility', 'visible');
               map.setLayoutProperty(map_layer_id[2], 'visibility', 'none');
               current_layer = map_layer_id[1];
               f_pop_ups();
+
+              // legend code
+              document.getElementById("legend_min").innerHTML = layer_min_max[1][0];
+              document.getElementById("legend_max").innerHTML = layer_min_max[1][1];
           } else if (drop_value == "daily"){ // update max value and inner text for slider DAY
             // slider code
               slider_max = 539;
               slider_input.max = slider_max;
               slider_heading.innerText = "Day: ";
               // set slider to the start
-              slider_heading_report.textContent = 0; slider_input.value = 0; slider_value = 0;
+              slider_ref_values = list_day;
+              slider_heading_report.textContent = slider_ref_values[0]; slider_input.value = 0; slider_value = 0;
             // layer code
               map.setLayoutProperty(map_layer_id[0], 'visibility', 'none');
               map.setLayoutProperty(map_layer_id[1], 'visibility', 'none');
               map.setLayoutProperty(map_layer_id[2], 'visibility', 'visible');
               current_layer = map_layer_id[2];
               f_pop_ups();
+              // legend code
+              document.getElementById("legend_min").innerHTML = layer_min_max[2][0];
+              document.getElementById("legend_max").innerHTML = layer_min_max[2][1];
           } else {
             console.log("Assigning slider values based on dropdown | \nError, something went horribly wrong.")
           };
@@ -195,12 +213,24 @@
       <button type ="button" class="button" id="play_button"><p>▶</p></button>
       <button type ="button" class="button" id="pause_button"><p>||</p></button>
       <button type ="button" class="button" id="restart_button"><p>↺</p></button>
+      <button type ="button" class="button" id="plus_one_button"><p>+1</p></button>
+      <button type ="button" class="button" id="minus_one_button"><p>-1</p></button>
 
       <!Slider bar>
       <div class='session' id='sliderbar'>
-        <h2><label id="slider_label">Month: </label><label id="slider_value_text">2018-01-31</label></h2>
+        <h2><label id="slider_label">Month: </label><label id="slider_value_text">January 2018</label></h2>
             <input id="slider" class="row" type="range" min="0" max="17" step="1" value="0"/>
       </div>
+      <script id = "ref_values">
+        var list_month = ['January 2018','February 2018','March 2018','April 2018','May 2018','June 2018','July 2018','August 2018','September 2018','October 2018','November 2018','December 2018','January 2019','February 2019','March 2019','April 2019','May 2019','June 2019',''];
+        var list_week = [
+          '07 Jan 2018','14 Jan 2018','21 Jan 2018','28 Jan 2018','04 Feb 2018','11 Feb 2018','18 Feb 2018','25 Feb 2018','04 Mar 2018','11 Mar 2018','18 Mar 2018','25 Mar 2018','01 Apr 2018','08 Apr 2018','15 Apr 2018','22 Apr 2018','29 Apr 2018','06 May 2018','13 May 2018','20 May 2018',
+          '27 May 2018','03 Jun 2018','10 Jun 2018','17 Jun 2018','24 Jun 2018','01 Jul 2018','08 Jul 2018','15 Jul 2018','22 Jul 2018','29 Jul 2018','05 Aug 2018','12 Aug 2018','19 Aug 2018','26 Aug 2018','02 Sep 2018','09 Sep 2018','16 Sep 2018','23 Sep 2018','30 Sep 2018','07 Oct 2018',
+          '14 Oct 2018','21 Oct 2018','28 Oct 2018','04 Nov 2018','11 Nov 2018','18 Nov 2018','25 Nov 2018','02 Dec 2018','09 Dec 2018','16 Dec 2018','23 Dec 2018','30 Dec 2018','06 Jan 2019','13 Jan 2019','20 Jan 2019','27 Jan 2019','03 Feb 2019','10 Feb 2019','17 Feb 2019','24 Feb 2019',
+          '03 Mar 2019','10 Mar 2019','17 Mar 2019','24 Mar 2019','31 Mar 2019','07 Apr 2019','14 Apr 2019','21 Apr 2019','28 Apr 2019','05 May 2019','12 May 2019','19 May 2019','26 May 2019','02 Jun 2019','09 Jun 2019','16 Jun 2019','23 Jun 2019',''];
+
+        var list_day = ['Mon 01 Jan 18','Tue 02 Jan 18','Wed 03 Jan 18','Thu 04 Jan 18','Fri 05 Jan 18','Sat 06 Jan 18','Sun 07 Jan 18','Mon 08 Jan 18','Tue 09 Jan 18','Wed 10 Jan 18','Thu 11 Jan 18','Fri 12 Jan 18','Sat 13 Jan 18','Sun 14 Jan 18','Mon 15 Jan 18','Tue 16 Jan 18','Wed 17 Jan 18','Thu 18 Jan 18','Fri 19 Jan 18','Sat 20 Jan 18','Sun 21 Jan 18','Mon 22 Jan 18','Tue 23 Jan 18','Wed 24 Jan 18','Thu 25 Jan 18','Fri 26 Jan 18','Sat 27 Jan 18','Sun 28 Jan 18','Mon 29 Jan 18','Tue 30 Jan 18','Wed 31 Jan 18','Thu 01 Feb 18','Fri 02 Feb 18','Sat 03 Feb 18','Sun 04 Feb 18','Mon 05 Feb 18','Tue 06 Feb 18','Wed 07 Feb 18','Thu 08 Feb 18','Fri 09 Feb 18','Sat 10 Feb 18','Sun 11 Feb 18','Mon 12 Feb 18','Tue 13 Feb 18','Wed 14 Feb 18','Thu 15 Feb 18','Fri 16 Feb 18','Sat 17 Feb 18','Sun 18 Feb 18','Mon 19 Feb 18','Tue 20 Feb 18','Wed 21 Feb 18','Thu 22 Feb 18','Fri 23 Feb 18','Sat 24 Feb 18','Sun 25 Feb 18','Mon 26 Feb 18','Tue 27 Feb 18','Wed 28 Feb 18','Thu 01 Mar 18','Fri 02 Mar 18','Sat 03 Mar 18','Sun 04 Mar 18','Mon 05 Mar 18','Tue 06 Mar 18','Wed 07 Mar 18','Thu 08 Mar 18','Fri 09 Mar 18','Sat 10 Mar 18','Sun 11 Mar 18','Mon 12 Mar 18','Tue 13 Mar 18','Wed 14 Mar 18','Thu 15 Mar 18','Fri 16 Mar 18','Sat 17 Mar 18','Sun 18 Mar 18','Mon 19 Mar 18','Tue 20 Mar 18','Wed 21 Mar 18','Thu 22 Mar 18','Fri 23 Mar 18','Sat 24 Mar 18','Sun 25 Mar 18','Mon 26 Mar 18','Tue 27 Mar 18','Wed 28 Mar 18','Thu 29 Mar 18','Fri 30 Mar 18','Sat 31 Mar 18','Sun 01 Apr 18','Mon 02 Apr 18','Tue 03 Apr 18','Wed 04 Apr 18','Thu 05 Apr 18','Fri 06 Apr 18','Sat 07 Apr 18','Sun 08 Apr 18','Mon 09 Apr 18','Tue 10 Apr 18','Wed 11 Apr 18','Thu 12 Apr 18','Fri 13 Apr 18','Sat 14 Apr 18','Sun 15 Apr 18','Mon 16 Apr 18','Tue 17 Apr 18','Wed 18 Apr 18','Thu 19 Apr 18','Fri 20 Apr 18','Sat 21 Apr 18','Sun 22 Apr 18','Mon 23 Apr 18','Tue 24 Apr 18','Wed 25 Apr 18','Thu 26 Apr 18','Fri 27 Apr 18','Sat 28 Apr 18','Sun 29 Apr 18','Mon 30 Apr 18','Tue 01 May 18','Wed 02 May 18','Thu 03 May 18','Fri 04 May 18','Sat 05 May 18','Sun 06 May 18','Mon 07 May 18','Tue 08 May 18','Wed 09 May 18','Thu 10 May 18','Fri 11 May 18','Sat 12 May 18','Sun 13 May 18','Mon 14 May 18','Tue 15 May 18','Wed 16 May 18','Thu 17 May 18','Fri 18 May 18','Sat 19 May 18','Sun 20 May 18','Mon 21 May 18','Tue 22 May 18','Wed 23 May 18','Thu 24 May 18','Fri 25 May 18','Sat 26 May 18','Sun 27 May 18','Mon 28 May 18','Tue 29 May 18','Wed 30 May 18','Thu 31 May 18','Fri 01 Jun 18','Sat 02 Jun 18','Sun 03 Jun 18','Mon 04 Jun 18','Tue 05 Jun 18','Wed 06 Jun 18','Thu 07 Jun 18','Fri 08 Jun 18','Sat 09 Jun 18','Sun 10 Jun 18','Mon 11 Jun 18','Tue 12 Jun 18','Wed 13 Jun 18','Thu 14 Jun 18','Fri 15 Jun 18','Sat 16 Jun 18','Sun 17 Jun 18','Mon 18 Jun 18','Tue 19 Jun 18','Wed 20 Jun 18','Thu 21 Jun 18','Fri 22 Jun 18','Sat 23 Jun 18','Sun 24 Jun 18','Mon 25 Jun 18','Tue 26 Jun 18','Wed 27 Jun 18','Thu 28 Jun 18','Fri 29 Jun 18','Sat 30 Jun 18','Sun 01 Jul 18','Mon 02 Jul 18','Tue 03 Jul 18','Wed 04 Jul 18','Thu 05 Jul 18','Fri 06 Jul 18','Sat 07 Jul 18','Sun 08 Jul 18','Mon 09 Jul 18','Tue 10 Jul 18','Wed 11 Jul 18','Thu 12 Jul 18','Fri 13 Jul 18','Sat 14 Jul 18','Sun 15 Jul 18','Mon 16 Jul 18','Tue 17 Jul 18','Wed 18 Jul 18','Thu 19 Jul 18','Fri 20 Jul 18','Sat 21 Jul 18','Sun 22 Jul 18','Mon 23 Jul 18','Tue 24 Jul 18','Wed 25 Jul 18','Thu 26 Jul 18','Fri 27 Jul 18','Sat 28 Jul 18','Sun 29 Jul 18','Mon 30 Jul 18','Tue 31 Jul 18','Wed 01 Aug 18','Thu 02 Aug 18','Fri 03 Aug 18','Sat 04 Aug 18','Sun 05 Aug 18','Mon 06 Aug 18','Tue 07 Aug 18','Wed 08 Aug 18','Thu 09 Aug 18','Fri 10 Aug 18','Sat 11 Aug 18','Sun 12 Aug 18','Mon 13 Aug 18','Tue 14 Aug 18','Wed 15 Aug 18','Thu 16 Aug 18','Fri 17 Aug 18','Sat 18 Aug 18','Sun 19 Aug 18','Mon 20 Aug 18','Tue 21 Aug 18','Wed 22 Aug 18','Thu 23 Aug 18','Fri 24 Aug 18','Sat 25 Aug 18','Sun 26 Aug 18','Mon 27 Aug 18','Tue 28 Aug 18','Wed 29 Aug 18','Thu 30 Aug 18','Fri 31 Aug 18','Sat 01 Sep 18','Sun 02 Sep 18','Mon 03 Sep 18','Tue 04 Sep 18','Wed 05 Sep 18','Thu 06 Sep 18','Fri 07 Sep 18','Sat 08 Sep 18','Sun 09 Sep 18','Mon 10 Sep 18','Tue 11 Sep 18','Wed 12 Sep 18','Thu 13 Sep 18','Fri 14 Sep 18','Sat 15 Sep 18','Sun 16 Sep 18','Mon 17 Sep 18','Tue 18 Sep 18','Wed 19 Sep 18','Thu 20 Sep 18','Fri 21 Sep 18','Sat 22 Sep 18','Sun 23 Sep 18','Mon 24 Sep 18','Tue 25 Sep 18','Wed 26 Sep 18','Thu 27 Sep 18','Fri 28 Sep 18','Sat 29 Sep 18','Sun 30 Sep 18','Mon 01 Oct 18','Tue 02 Oct 18','Wed 03 Oct 18','Thu 04 Oct 18','Fri 05 Oct 18','Sat 06 Oct 18','Sun 07 Oct 18','Mon 08 Oct 18','Tue 09 Oct 18','Wed 10 Oct 18','Thu 11 Oct 18','Fri 12 Oct 18','Sat 13 Oct 18','Sun 14 Oct 18','Mon 15 Oct 18','Tue 16 Oct 18','Wed 17 Oct 18','Thu 18 Oct 18','Fri 19 Oct 18','Sat 20 Oct 18','Sun 21 Oct 18','Mon 22 Oct 18','Tue 23 Oct 18','Wed 24 Oct 18','Thu 25 Oct 18','Fri 26 Oct 18','Sat 27 Oct 18','Sun 28 Oct 18','Mon 29 Oct 18','Tue 30 Oct 18','Wed 31 Oct 18','Thu 01 Nov 18','Fri 02 Nov 18','Sat 03 Nov 18','Sun 04 Nov 18','Mon 05 Nov 18','Tue 06 Nov 18','Wed 07 Nov 18','Thu 08 Nov 18','Fri 09 Nov 18','Sat 10 Nov 18','Sun 11 Nov 18','Mon 12 Nov 18','Tue 13 Nov 18','Wed 14 Nov 18','Thu 15 Nov 18','Fri 16 Nov 18','Sat 17 Nov 18','Sun 18 Nov 18','Mon 19 Nov 18','Tue 20 Nov 18','Wed 21 Nov 18','Thu 22 Nov 18','Fri 23 Nov 18','Sat 24 Nov 18','Sun 25 Nov 18','Mon 26 Nov 18','Tue 27 Nov 18','Wed 28 Nov 18','Thu 29 Nov 18','Fri 30 Nov 18','Sat 01 Dec 18','Sun 02 Dec 18','Mon 03 Dec 18','Tue 04 Dec 18','Wed 05 Dec 18','Thu 06 Dec 18','Fri 07 Dec 18','Sat 08 Dec 18','Sun 09 Dec 18','Mon 10 Dec 18','Tue 11 Dec 18','Wed 12 Dec 18','Thu 13 Dec 18','Fri 14 Dec 18','Sat 15 Dec 18','Sun 16 Dec 18','Mon 17 Dec 18','Tue 18 Dec 18','Wed 19 Dec 18','Thu 20 Dec 18','Fri 21 Dec 18','Sat 22 Dec 18','Sun 23 Dec 18','Mon 24 Dec 18','Tue 25 Dec 18','Wed 26 Dec 18','Thu 27 Dec 18','Fri 28 Dec 18','Sat 29 Dec 18','Sun 30 Dec 18','Mon 31 Dec 18','Tue 01 Jan 19','Wed 02 Jan 19','Thu 03 Jan 19','Fri 04 Jan 19','Sat 05 Jan 19','Sun 06 Jan 19','Mon 07 Jan 19','Tue 08 Jan 19','Wed 09 Jan 19','Thu 10 Jan 19','Fri 11 Jan 19','Sat 12 Jan 19','Sun 13 Jan 19','Mon 14 Jan 19','Tue 15 Jan 19','Wed 16 Jan 19','Thu 17 Jan 19','Fri 18 Jan 19','Sat 19 Jan 19','Sun 20 Jan 19','Mon 21 Jan 19','Tue 22 Jan 19','Wed 23 Jan 19','Thu 24 Jan 19','Fri 25 Jan 19','Sat 26 Jan 19','Sun 27 Jan 19','Mon 28 Jan 19','Tue 29 Jan 19','Wed 30 Jan 19','Thu 31 Jan 19','Fri 01 Feb 19','Sat 02 Feb 19','Sun 03 Feb 19','Mon 04 Feb 19','Tue 05 Feb 19','Wed 06 Feb 19','Thu 07 Feb 19','Fri 08 Feb 19','Sat 09 Feb 19','Sun 10 Feb 19','Mon 11 Feb 19','Tue 12 Feb 19','Wed 13 Feb 19','Thu 14 Feb 19','Fri 15 Feb 19','Sat 16 Feb 19','Sun 17 Feb 19','Mon 18 Feb 19','Tue 19 Feb 19','Wed 20 Feb 19','Thu 21 Feb 19','Fri 22 Feb 19','Sat 23 Feb 19','Sun 24 Feb 19','Mon 25 Feb 19','Tue 26 Feb 19','Wed 27 Feb 19','Thu 28 Feb 19','Fri 01 Mar 19','Sat 02 Mar 19','Sun 03 Mar 19','Mon 04 Mar 19','Tue 05 Mar 19','Wed 06 Mar 19','Thu 07 Mar 19','Fri 08 Mar 19','Sat 09 Mar 19','Sun 10 Mar 19','Mon 11 Mar 19','Tue 12 Mar 19','Wed 13 Mar 19','Thu 14 Mar 19','Fri 15 Mar 19','Sat 16 Mar 19','Sun 17 Mar 19','Mon 18 Mar 19','Tue 19 Mar 19','Wed 20 Mar 19','Thu 21 Mar 19','Fri 22 Mar 19','Sat 23 Mar 19','Sun 24 Mar 19','Mon 25 Mar 19','Tue 26 Mar 19','Wed 27 Mar 19','Thu 28 Mar 19','Fri 29 Mar 19','Sat 30 Mar 19','Sun 31 Mar 19','Mon 01 Apr 19','Tue 02 Apr 19','Wed 03 Apr 19','Thu 04 Apr 19','Fri 05 Apr 19','Sat 06 Apr 19','Sun 07 Apr 19','Mon 08 Apr 19','Tue 09 Apr 19','Wed 10 Apr 19','Thu 11 Apr 19','Fri 12 Apr 19','Sat 13 Apr 19','Sun 14 Apr 19','Mon 15 Apr 19','Tue 16 Apr 19','Wed 17 Apr 19','Thu 18 Apr 19','Fri 19 Apr 19','Sat 20 Apr 19','Sun 21 Apr 19','Mon 22 Apr 19','Tue 23 Apr 19','Wed 24 Apr 19','Thu 25 Apr 19','Fri 26 Apr 19','Sat 27 Apr 19','Sun 28 Apr 19','Mon 29 Apr 19','Tue 30 Apr 19','Wed 01 May 19','Thu 02 May 19','Fri 03 May 19','Sat 04 May 19','Sun 05 May 19','Mon 06 May 19','Tue 07 May 19','Wed 08 May 19','Thu 09 May 19','Fri 10 May 19','Sat 11 May 19','Sun 12 May 19','Mon 13 May 19','Tue 14 May 19','Wed 15 May 19','Thu 16 May 19','Fri 17 May 19','Sat 18 May 19','Sun 19 May 19','Mon 20 May 19','Tue 21 May 19','Wed 22 May 19','Thu 23 May 19','Fri 24 May 19','Sat 25 May 19','Sun 26 May 19','Mon 27 May 19','Tue 28 May 19','Wed 29 May 19','Thu 30 May 19','Fri 31 May 19','Sat 01 Jun 19','Sun 02 Jun 19','Mon 03 Jun 19','Tue 04 Jun 19','Wed 05 Jun 19','Thu 06 Jun 19','Fri 07 Jun 19','Sat 08 Jun 19','Sun 09 Jun 19','Mon 10 Jun 19','Tue 11 Jun 19','Wed 12 Jun 19','Thu 13 Jun 19','Fri 14 Jun 19','Sat 15 Jun 19','Sun 16 Jun 19','Mon 17 Jun 19','Tue 18 Jun 19','Wed 19 Jun 19','Thu 20 Jun 19','Fri 21 Jun 19','Sat 22 Jun 19','Sun 23 Jun 19',''];
+      </script>
       <script id = "slider_code">
         var slider_min = 0;
         var slider_starter_value = slider_min;
@@ -209,17 +239,12 @@
         var slider_input = document.getElementById("slider");
         var slider_heading = document.getElementById("slider_label");
         var slider_heading_report = document.getElementById("slider_value_text");
-
-        // List of dates
-        var list_month = ["2018-01-31","2018-02-28","2018-03-31","2018-04-30","2018-05-31",
-                      "2018-06-30","2018-07-31","2018-08-31","2018-09-30","2018-10-31",
-                      "2018-11-30","2018-12-31","2019-01-31","2019-02-28","2019-03-31",
-                      "2019-04-30","2019-05-31","2019-06-30"]
+        var slider_ref_values = list_month;
 
         // updates slider value instantly
         document.getElementById('slider').addEventListener('input', function(e) {
           slider_value = parseInt(e.target.value);
-          slider_heading_report.textContent = list_month[slider_value];
+          slider_heading_report.textContent = slider_ref_values[slider_value];
         });
       </script>
 
@@ -249,6 +274,10 @@
 
       // Layer manipulation (start at 0)
       var current_layer = map_layer_id[0];
+      var tiles_daily_min_max = ["1k","1.5m+"];
+      var tiles_weekly_min_max = ["13k","9m+"];
+      var tiles_monthly_min_max = ["0.1m","35m+"];
+      var layer_min_max = [tiles_monthly_min_max,tiles_weekly_min_max,tiles_daily_min_max];
 
       // timer object
       var intervalId;
@@ -295,15 +324,9 @@
                 [{zoom: 0, value: 28}, 1],
                 [{zoom: 0, value: 40}, 2],
                 [{zoom: 0, value: 70}, 4],
-                [{zoom: 5, value: 28}, 1],
-                [{zoom: 5, value: 40}, 10],
-                [{zoom: 5, value: 70}, 30],
-                [{zoom: 8, value: 0}, 16],
-                [{zoom: 8, value: 30}, 60],
-                [{zoom: 8, value: 60}, 200],
-                [{zoom: 14, value: 0}, 32],
-                [{zoom: 14, value: 5}, 100],
-                [{zoom: 14, value: 16}, 300]
+                [{zoom: 15, value: 28}, 20],
+                [{zoom: 15, value: 40}, 40],
+                [{zoom: 15, value: 70}, 80]
               ]
             },
             "circle-color": {
@@ -415,7 +438,7 @@
              //set new slider value
              document.getElementById('slider').value = slider_value;
              map.setFilter(current_layer, ['==', ['get', 'time_id'], slider_value]);
-             slider_heading_report.textContent = slider_value;
+             slider_heading_report.textContent = slider_ref_values[slider_value];
              console.log("New slider value was set - yay :)");
              slider_value++;
           }, movement_speed);
@@ -432,8 +455,35 @@
         document.getElementById("restart_button").addEventListener("click", function(){
           slider_value = 0;
           slider_input.value = 0;
-          slider_heading_report.textContent = slider_value;
+          slider_heading_report.textContent = slider_ref_values[slider_value];
+          map.setFilter(current_layer, ['==', ['get', 'time_id'], slider_value]);
         });
+
+        document.getElementById("plus_one_button").addEventListener("click", function(){
+          if (parseInt(slider_value) < parseInt(slider_max)){
+            slider_value = slider_value + 1;
+            slider_input.value = slider_value;
+            slider_heading_report.textContent = slider_ref_values[slider_value];
+            map.setFilter(current_layer, ['==', ['get', 'time_id'], slider_value]);
+          }
+
+          //slider_value = slider_value + 1;
+          //slider_input.value = slider_value;
+          //slider_heading_report.textContent = slider_ref_values[slider_value];
+          //map.setFilter(current_layer, ['==', ['get', 'time_id'], slider_value]);
+        });
+
+        document.getElementById("minus_one_button").addEventListener("click", function(){
+          if (parseInt(slider_value) > parseInt(slider_min)){
+            slider_value = slider_value - 1;
+            slider_input.value = slider_value;
+            slider_heading_report.textContent = slider_ref_values[slider_value];
+            map.setFilter(current_layer, ['==', ['get', 'time_id'], slider_value]);
+          }
+        });
+
+
+
 
     </script>
 
@@ -453,7 +503,12 @@
             console.log("entered")
             console.log(e)
             var coordinates = e.features[0].geometry.coordinates.slice();
-            var description = '<b>City:</b> ' + e.features[0].properties.city1 + '<b><br/>Date:</b> ' + e.features[0].properties.time;
+            var description = '<b>City:</b> ' + e.features[0].properties.city1 +
+                              //'<b><br/>Date:</b> ' + e.features[0].properties.time +
+                              '<b><br/>People moving:</b> ' + (e.features[0].properties.hot / 1000000).toFixed(2) + " million"
+                              //'<b><br/>People moving:</b> ' + Math.round(e.features[0].properties.hot / 1000000) + " million"
+
+                              ;
             console.log(description)
         popup
             .setLngLat(coordinates)
@@ -489,7 +544,7 @@
       };
 
       f_stop_play();
-      
+
     </script>
   </body>
 </html>
