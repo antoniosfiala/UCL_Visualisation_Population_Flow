@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------
    HTML5 Bones
-   This stylesheet contains print styling and a section for 
-   you to simply add your own. This is a basic template 
+   This stylesheet contains print styling and a section for
+   you to simply add your own. This is a basic template
    after all.
    ---------------------------------------------------------*/
 	body {
@@ -9,14 +9,14 @@
     /* -webkit-transform:translate3d(0,0,0); */
 	}
 	/* Default link styling */
-/*	
+/*
   a:link { color:#0271fb; }
 	a:visited { color:#bd02fb; }
 	a:hover, a:focus { color:#000; }
 	a:active { color:#fb0e02; }
-*/	
-	
-	
+*/
+
+
 /* ---------------------------------------------------------
    Author's styles
    ---------------------------------------------------------*/
@@ -441,7 +441,7 @@ text.region {
 }
 
 
-	
+
 /* ---------------------------------------------------------
    Print styles
    ---------------------------------------------------------*/
@@ -464,14 +464,14 @@ text.region {
 		color:#06c;
 		border:none;
 	}
-	/* Don't show link destinations for JavaScript or internal links */ 
+	/* Don't show link destinations for JavaScript or internal links */
 	a[href^="javascript:"]:after, a[href^="#"]:after { content:""; }
-	
+
 	/* Show abbr title value in brackets after the text */
 	abbr[title]:after { content: " (" attr(title) ")"; }
 
-	figure { 
-		margin-bottom:1em; 
+	figure {
+		margin-bottom:1em;
 		overflow:hidden;
 	}
 
