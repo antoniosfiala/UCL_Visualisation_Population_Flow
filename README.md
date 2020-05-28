@@ -9,5 +9,5 @@ The accompanying report can be found [here]()
 
 Our pitch presentation can be found [here]()
 
-Team comprised of (country of origin, country of work): 
+**Team comprised of (country of origin, country of work):**<br> 
 Xiang Zhou 🇨🇳🇨🇳, Xin Zhao 🇨🇳🇨🇳,Diqiu Yang 🇨🇳🇬🇧 & Antonios Fiala 🇬🇷🇬🇧
