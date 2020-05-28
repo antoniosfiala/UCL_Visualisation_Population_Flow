@@ -1,0 +1,195 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <link rel="icon" href="https://static.jianshukeji.com/hcode/images/favicon.ico">
+    <style>
+        /* css 代码  */
+        #container1 {
+
+            margin: 0 auto;
+            width: 45%;
+            float: left;
+            margin-left:30%;
+        }
+
+    </style>
+    <script src="https://code.highcharts.com/highcharts.js" ></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/sunburst.js"></script>
+
+</head>
+
+<body>
+  <select class = "drop_down" id = "selector_year">
+    <option selected disabled>Select year to explore</option>
+    <option value = "0">2010</option>
+    <option value = "1">2019</option>
+  </select>
+    <div id="container1"></div>
+
+    <!-- Load data from javascript files-->
+    <script type="text/javascript" src= "./Project_1_data.js"></script>
+    <script>
+      Highcharts.getOptions().colors.splice(0, 0, 'transparent');
+    </script>
+
+    <!-- default view -->
+    <script>
+        // Default view
+        Highcharts.setOptions({
+            lang: {
+                thousandsSep: ','
+            }
+        });
+
+        Highcharts.chart('container1', {
+
+            chart: {
+                height: '100%'
+            },
+
+            title: {
+                text: '2010 Population migration in Asia and Europe'
+            },
+            subtitle: {
+                text: 'data source： <a>United Nations-Population Division</a>'
+            },
+            series: [{
+                type: "sunburst",
+                data: data_2010,
+                allowDrillToNode: true,
+                cursor: 'pointer',
+                dataLabels: {
+
+                    formatter: function () {
+                        var shape = this.point.node.shapeArgs;
+
+                        var innerArcFraction = (shape.end - shape.start) / (2 * Math.PI);
+                        var perimeter = 2 * Math.PI * shape.innerR;
+
+                        var innerArcPixels = innerArcFraction * perimeter;
+
+                        if (innerArcPixels > 16) {
+                            return this.point.name;
+                        }
+                    }
+                },
+                levels: [{
+                    level: 2,
+                    colorByPoint: true,
+                    dataLabels: {
+                        rotationMode: 'parallel'
+                    }
+                },
+                {
+                    level: 3,
+                    colorVariation: {
+                        key: 'brightness',
+                        to: -0.5
+                    }
+                }, {
+                    level: 4,
+                    colorVariation: {
+                        key: 'brightness',
+                        to: 0.5
+                    }
+                }]
+
+            }],
+            tooltip: {
+                headerFormat: "",
+                pointFormat: '<b>{point.name}</b> migration is ：<b>{point.value}</b>'
+            }
+        });
+
+    </script>
+
+    <script>
+        // respond to year selector
+        var year_selection = document.getElementById("selector_year");
+        var data_set_list = [data_2010,data_2019];
+        var year_selected = "0";
+        var current_dataset = data_set_list[parseInt(year_selected)];
+
+        function f_update_current_selection_var()
+        {
+          year_selected = year_selection.value;
+          current_dataset = data_set_list[parseInt(year_selected)];
+        };
+
+        function f_updated_current_data_shown(){
+
+          var selectedText = year_selection.options[year_selection.selectedIndex].text;
+
+
+          Highcharts.chart('container1', {
+
+              chart: {
+                  height: '100%'
+              },
+
+              title: {
+                  text: selectedText + ' Population migration in Asia and Europe'
+              },
+              subtitle: {
+                  text: 'data source： <a>United Nations-Population Division​</a>'
+              },
+              series: [{
+                  type: "sunburst",
+                  data: current_dataset,
+                  allowDrillToNode: true,
+                  cursor: 'pointer',
+                  dataLabels: {
+                      formatter: function () {
+                          var shape = this.point.node.shapeArgs;
+
+                          var innerArcFraction = (shape.end - shape.start) / (2 * Math.PI);
+                          var perimeter = 2 * Math.PI * shape.innerR;
+
+                          var innerArcPixels = innerArcFraction * perimeter;
+
+                          if (innerArcPixels > 16) {
+                              return this.point.name;
+                          }
+                      }
+                  },
+                  levels: [{
+                      level: 2,
+                      colorByPoint: true,
+                      dataLabels: {
+                          rotationMode: 'parallel'
+                      }
+                  },
+                  {
+                      level: 3,
+                      colorVariation: {
+                          key: 'brightness',
+                          to: -0.5
+                      }
+                  }, {
+                      level: 4,
+                      colorVariation: {
+                          key: 'brightness',
+                          to: 0.5
+                      }
+                  }]
+
+              }],
+              tooltip: {
+                  headerFormat: "",
+                  pointFormat: '<b>{point.name}</b> migration is ：<b>{point.value}</b>'
+              }
+          });
+        };
+
+        document.getElementById("selector_year").addEventListener("change", function(e){
+          f_update_current_selection_var();
+          f_updated_current_data_shown();
+        });
+    </script>
+
+</body>
+</html>

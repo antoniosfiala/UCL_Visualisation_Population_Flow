@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>On the move | Project 4</title>
+    <meta content="" name="descriptison">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Lato:400,300,700,900" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+    <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet">
+
+    <!-- LOCAL STYLE -->
+    <style>
+      /* DEFINE CSS VARIABLES */
+      :root {
+        --proj_3_background: #1a1a1a;
+        --proj_3_font_colour: rgba(255, 255, 255, 1);
+      }
+
+      /* ENTIRE SITE BACKDROP */
+      #proj_3_body{background-color: var(--proj_3_background);}
+
+      #proj_3_left_third{
+        padding: 1%;
+        width: 26%;
+        height: 100%;
+        float: left;
+        background-color: var(--proj_3_background);
+      }
+      #proj_3_right_remain{
+        width: 74%;
+        float: right;
+      }
+      #proj_3_map_main{
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+      #proj_3_map {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 100%;
+      }
+
+      .map_overlay {
+          position: absolute;
+          top: 3%;
+          left: 25%;
+          padding: 5px;
+          background: rgba(255, 255, 255, 0.8);
+          margin-left: 20px;
+          overflow: auto;
+          border-radius: 3px;
+          width: 250px;
+        }
+
+      p1{font-size: 10px; color: var(--proj_3_font_colour);font-weight: lighter;}
+      p2{font-size: 8px; color: var(--proj_3_font_colour);font-weight: lighter;display:block;line-height: 1.5;}
+      p3{font-size: 10px; color: rgba(215,25,28,0.8);font-weight: bold;display:block;line-height: 1.5;}
+      p4{font-size: 10px; color: var(--proj_3_background);font-weight: 300;display:block;line-height: 1.5;}
+      pbutton{font-size: 10px; color: var(--proj_3_background);font-weight: bold;}
+      p0{font-size: 12px; color: var(--proj_3_font_colour);font-weight: bold;}
+      h6{color: var(--proj_3_font_colour); font-weight: bold;}
+      hr.divider1 {border: 0.5px solid gray;}
+
+      .map_button{
+        background-color: var(--proj_3_font_colour); color: gray;outline: 0px;
+        text-align: center; font-size: 10px;
+        margin: 0px 0px; border-radius: 4px;
+        width: 23%; height: 20px;
+        margin-bottom: 0%; margin-top: 1%; cursor: pointer;
+      }
+      .drop_down{width: 47%; height: 15px;text-align: center; font-size: 10px;}
+
+      #measure_select{margin-left: 0.5%;}
+
+      .session {margin-bottom: 20px; margin-left: 0%;}
+      .row {height: 12px;width: 95%;margin-left: 1%}
+
+      .colour_intense {
+        background: linear-gradient(
+          to right,
+          rgba(45, 196, 178,0.5),rgba(59, 179, 195,0.5),rgba(102, 158, 196,0.5),rgba(139, 136, 182,0.5),rgba(162, 113, 155,0.5),rgba(170, 94, 121,0.5));
+        margin-bottom: 0px;
+        border-radius: 4px;
+      }
+
+      .colour_peak {
+        background: linear-gradient(
+          to right,
+          rgba(44,123,182,0.5),rgba(255,255,191,0.5),rgba(215,25,28,0.5));
+        margin-bottom: 0px;
+        border-radius: 4px;
+      }
+
+      .legend_label {width: 16.5%;display: inline-block;text-align: center;}
+    </style>
+
+  </head>
+
+  <body id = "proj_3_body">
+    <!-- MAIN PART FOR PROJECT 3 -->
+    <main id="proj_3_main">
+      <!-- LEFT THIRD WITH DESCRIPTION AND CONTROLS -->
+      <div id = "proj_3_left_third">
+        <h6>Project 4 | A directional analysis</h6>
+
+        <p0>Description:<br></p0>
+        <p1>This project explores the direction of travel at a monthly level between cities in China.
+          You can choose to view migration towards or away from a city as well as a colourscheme which will help you uncover different patterns in the data.</p1>
+        <hr class="divider1">
+
+        <p0>Data exploratory controls:<br></p0>
+        <select class = "drop_down" id = "direction_select">
+          <option selected disabled>Select travel direction</option>
+          <option value = "1">Heat departing from the city (top 10)</option>
+          <option value = "2">Heat arriving at the city</option>
+        </select>
+
+        <select class = "drop_down" id = "measure_select">
+          <option selected disabled>Select colour measure</option>
+          <option value = "measure_heat">Colour intensity</option>
+          <option value = "measure_peak">Colour peak</option>
+        </select>
+
+        <div class="session" id="legend_intense">
+          <p0 id="legend_intense_title">Colour scale (millions): scale across all cities</p0>
+          <p2>Intensity measure shows the country-wide intensity of migration</p2>
+          <div class="row colour_intense"></div>
+          <div class="row labels">
+            <div class="legend_label"><p1 id ="legend_intense_min">0.1m</p1></div>
+            <div class="legend_label"></div>
+            <div class="legend_label"></div>
+            <div class="legend_label"></div>
+            <div class="legend_label"></div>
+            <div class="legend_label"><p1 id = "legend_intense_max">35m+</p1></div>
+          </div>
+        </div>
+
+        <div class="session" id="legend_peak">
+          <p0 id="legend_peak_title">Colour scale (min-max): applied to individual cities</p0>
+          <p2>Peak measure that shows the progress of each city's migration between its lowest and its highest value.</p2>
+          <div class="row colour_peak"></div>
+          <div class="row labels">
+            <div class="legend_label"><p1 id ="legend_min">Min</p1></div>
+            <div class="legend_label"></div>
+            <div class="legend_label"></div>
+            <div class="legend_label"></div>
+            <div class="legend_label"></div>
+            <div class="legend_label"><p1 id = "legend_max">Max</p1></div>
+          </div>
+        </div>
+
+        <p0>Temporal exploratory controls:<br></p0>
+        <button class="map_button" id="button_play"><pbutton>Play</pbutton></button>
+        <button class="map_button" id="button_pause"><pbutton>Pause</pbutton></button>
+        <button class="map_button" id="button_reset"><pbutton>Reset</pbutton></button>
+        <button class="map_button" id="button_step_fwd"><pbutton>+ Step</pbutton></button>
+        <button class="map_button" id="button_step_bk"><pbutton>- Step</pbutton></button>
+
+        <div class='session' id='sliderbar'>
+          <p0><label id="slider_label">Month:&nbsp</label><label id="slider_value_text">January 2018</label></p0>
+              <input id="slider_map_3_input" class="row" type="range" min="0" max="17" step="1" value="0"/>
+        </div>
+        <br>
+        <p0>Potential findings and presets of interest:<br></p0>
+        <br>
+        <br>
+        <p0>Source:<br></p0>
+        <p2>Data purchased from <a href="https://heat.qq.com">Tencent Data Store</a> for Jan.2018 - June 2019</p2>
+
+      </div>
+
+      <!-- REMAINING TWO THIRDS WITH MAP -->
+      <div id = "proj_3_right_remain">
+        <div id="proj_3_map_main">
+            <div id="proj_3_map"></div>
+        </div>
+        <div class='map_overlay' id="map_warning"><p3>Navigation message:</p3><p4>Daily data is only visible at zoom of 6 or greater.<br>
+          <p3>Click on the map...</p3>...to fly to an area at correct zoom.</p4></div>
+
+      </div>
+    </main>
+
+    <!-- External reference files -->
+    <script type="text/javascript" src= "./ref_values.js"></script>
+
+    <!-- Mapping variables and base load-->
+    <script>
+      // Mapping token
+      var proj_3_access_token = 'pk.eyJ1IjoiYW50b25pb3NmaWFsYSIsImEiOiJjazduaWNyMDMwMndnM3NtdHMwY2Jya2s1In0.v4PaAiRVs6h3h7lNNfjZqw';
+      mapboxgl.accessToken = proj_3_access_token;
+
+      // Layer VARIABLES (geocoded)
+      // this is the reference layer for cities
+      var tiles_china_weekly =  ["mapbox://antoniosfiala.2xbckegg","all_city_reference-dnexk1"];
+      var tiles_china_daily =   ["mapbox://antoniosfiala.7sxjeere","china_cities_geo_daily-9rform"];
+
+      var tiles_china_monthly = ["mapbox://antoniosfiala.5esww6l7","china_month_0_link-03irvr"];
+      var month_link_tile_1 =   ["mapbox://antoniosfiala.0gt3qir0","china_month_1_link-6fzzun"];
+      var month_link_tile_2 =   ["mapbox://antoniosfiala.2lf2j85s","china_month_2_link-1lrr0a"];
+      var month_link_tile_3 =   ["mapbox://antoniosfiala.71q5ou0a","china_month_3_link-dhp6bp"];
+      var month_link_tile_4 =   ["mapbox://antoniosfiala.b634jz7x","china_month_4_link-5b1rck"];
+      var month_link_tile_5 =   ["mapbox://antoniosfiala.19lf0r44","china_month_5_link-dp9d7z"];
+      var month_link_tile_6 =   ["mapbox://antoniosfiala.dfvfjm7q","china_month_6_link-8f4hpo"];
+      var month_link_tile_7 =   ["mapbox://antoniosfiala.40xz9i1q","china_month_7_link-5dpnyj"];
+      var month_link_tile_8 =   ["mapbox://antoniosfiala.cbj82ar9","china_month_8_link-c4pruj"];
+      var month_link_tile_9 =   ["mapbox://antoniosfiala.2ypu1haj","china_month_9_link-b9cdq4"];
+      var month_link_tile_10=   ["mapbox://antoniosfiala.1hhfiiok","china_month_10_link-ddavw6"];
+      var month_link_tile_11=   ["mapbox://antoniosfiala.6j8hbie6","china_month_11_link-6410ma"];
+      var month_link_tile_12=   ["mapbox://antoniosfiala.27ah9b53","china_month_12_link-0zgo8q"];
+      var month_link_tile_13=   ["mapbox://antoniosfiala.7vnn9ye1","china_month_13_link-56w4vi"];
+      var month_link_tile_14=   ["mapbox://antoniosfiala.czbdog6a","china_month_14_link-du5whu"];
+      var month_link_tile_15=   ["mapbox://antoniosfiala.avvy35gq","china_month_15_link-0yx03i"];
+      var month_link_tile_16=   ["mapbox://antoniosfiala.12m5fr6q","china_month_16_link-dpb4se"];
+      var month_link_tile_17=   ["mapbox://antoniosfiala.741sjisu","china_month_17_link-197ava"];
+
+      var month_link_all = [tiles_china_monthly,month_link_tile_1,month_link_tile_2,month_link_tile_3,month_link_tile_4,
+        month_link_tile_5,month_link_tile_6,month_link_tile_7,month_link_tile_8,month_link_tile_9,
+        month_link_tile_10,month_link_tile_11,month_link_tile_12,month_link_tile_13,month_link_tile_14,
+        month_link_tile_15,month_link_tile_16,month_link_tile_17];
+
+      var month_link_name = ["month 0","month 1","month 2","month 3","month 4","month 5","month 6","month 7","month 8",
+      "month 9","month 10","month 11","month 12","month 13","month 14","month 15","month 16","month 17"];
+
+      var current_month_show = month_link_name[0];
+
+      // Layer VARIABLES
+      //var tiles_china_monthly = ["mapbox://antoniosfiala.6h9rsavo","china_cities_monthly_extra-2xpycr"];
+      //var tiles_china_weekly =  ["mapbox://antoniosfiala.8icqk0aq","china_cities_weekly_extra-4jhzb4"];
+      //var tiles_china_daily =   ["mapbox://antoniosfiala.cpxzolnu","china_cities_daily_extra-b39hlm"];
+      var tiles_all = [tiles_china_monthly,tiles_china_weekly,tiles_china_daily];
+
+      var map_source_name = ["china_cities_monthly","china_cities_weekly","china_cities_daily"];
+      var map_layer_id = ["layer_city_month","layer_city_week","layer_city_day"];
+      var current_layer = map_layer_id[0];
+
+      // Load base map
+      var proj_3_map = new mapboxgl.Map({
+        container: 'proj_3_map', // container id specified in the HTML
+        style: 'mapbox://styles/antoniosfiala/ck7hwy44f51od1iodg0d0um6u',
+        center: [100,35], // initial map center in [lon, lat]
+        zoom: 2.7//this way we can see all of China
+      });
+
+      // Colouring
+      var colour_peak_list = ["rgba(45, 196, 178,0.75)","rgba(59, 179, 195,0.75)","rgba(102, 158, 196,0.75)","rgba(139, 136, 182,0.75)","rgba(162, 113, 155,0.75)","rgba(170, 94, 121,0.75)"];
+      var colour_intense_list = ["rgba(44,123,182,0.5)","rgba(255,255,191,0.5)","rgba(215,25,28,0.5)"];
+      // Peak is always the same as it ranges between 0 and 1
+      var colour_peak = [[{zoom: 0, value:0.0},colour_intense_list[0]],[{zoom: 0, value:0.5},colour_intense_list[1]],[{zoom: 0, value:1.0},colour_intense_list[2]]];
+      // Month set up
+      var colour_intense_month = [[{zoom: 0, value:  4.0},colour_peak_list[0]],[{zoom: 0, value:  6.5},colour_peak_list[1]],
+                                  [{zoom: 0, value:  9.0},colour_peak_list[2]],[{zoom: 0, value: 11.5},colour_peak_list[3]],
+                                  [{zoom: 0, value: 13.0},colour_peak_list[4]],[{zoom: 0, value: 16.0},colour_peak_list[5]]];
+
+      var colour_intense_week  = [[{zoom: 0, value:  13267},colour_peak_list[0]],[{zoom: 0, value:  500000},colour_peak_list[1]],
+                                  [{zoom: 0, value:1000000},colour_peak_list[2]],[{zoom: 0, value: 2000000},colour_peak_list[3]],
+                                  [{zoom: 0, value:4000000},colour_peak_list[4]],[{zoom: 0, value:10000000},colour_peak_list[5]]];
+
+      var colour_intense_day  = [[{zoom: 0, value:    1000},colour_peak_list[0]],[{zoom: 0, value:   5000},colour_peak_list[1]],
+                                  [{zoom: 0, value: 100000},colour_peak_list[2]],[{zoom: 0, value: 500000},colour_peak_list[3]],
+                                  [{zoom: 0, value:1000000},colour_peak_list[4]],[{zoom: 0, value:1500000},colour_peak_list[5]]];
+
+      // group all colour schemes
+      var map_layer_heat_colour = [colour_intense_month,colour_intense_week,colour_intense_day];
+      var current_layer_heat_colour = map_layer_heat_colour[0];
+      // replaced colour_month
+      var colour_array = [["hot_log",current_layer_heat_colour,"interval"],["hot_min_max",colour_peak,"exponential"]];
+      var colour_current = colour_array[0];
+
+      // Dictionary to call in updating layer style
+      var colour_dict = {
+                    property: colour_current[0],
+                    type: "interval",
+                    stops: colour_current[1]};
+
+      // direction of travel and city filtering
+      var current_direction_selected = "city1";
+      var current_filter_city = "";
+
+    </script>
+
+    <!-- Mapping layer load -->
+    <script>
+      // load map and add sources
+      proj_3_map.on('load', function(){
+        // Three sources
+        proj_3_map.addSource(map_source_name[0], {type: "vector",url: tiles_all[0][0]});
+        proj_3_map.addSource(map_source_name[1], {type: "vector",url: tiles_all[1][0]});
+
+        proj_3_map.addSource(month_link_name[0],  {type: "vector",url: month_link_all[0][0]});
+        proj_3_map.addSource(month_link_name[1],  {type: "vector",url: month_link_all[1][0]});
+        proj_3_map.addSource(month_link_name[2],  {type: "vector",url: month_link_all[2][0]});
+        proj_3_map.addSource(month_link_name[3],  {type: "vector",url: month_link_all[3][0]});
+        proj_3_map.addSource(month_link_name[4],  {type: "vector",url: month_link_all[4][0]});
+        proj_3_map.addSource(month_link_name[5],  {type: "vector",url: month_link_all[5][0]});
+        proj_3_map.addSource(month_link_name[6],  {type: "vector",url: month_link_all[6][0]});
+        proj_3_map.addSource(month_link_name[7],  {type: "vector",url: month_link_all[7][0]});
+        proj_3_map.addSource(month_link_name[8],  {type: "vector",url: month_link_all[8][0]});
+        proj_3_map.addSource(month_link_name[9],  {type: "vector",url: month_link_all[9][0]});
+        proj_3_map.addSource(month_link_name[10], {type: "vector",url: month_link_all[10][0]});
+        proj_3_map.addSource(month_link_name[11], {type: "vector",url: month_link_all[11][0]});
+        proj_3_map.addSource(month_link_name[12], {type: "vector",url: month_link_all[12][0]});
+        proj_3_map.addSource(month_link_name[13], {type: "vector",url: month_link_all[13][0]});
+        proj_3_map.addSource(month_link_name[14], {type: "vector",url: month_link_all[14][0]});
+        proj_3_map.addSource(month_link_name[15], {type: "vector",url: month_link_all[15][0]});
+        proj_3_map.addSource(month_link_name[16], {type: "vector",url: month_link_all[16][0]});
+        proj_3_map.addSource(month_link_name[17], {type: "vector",url: month_link_all[17][0]});
+
+      });
+      // once map is loaded start drawing layers
+      proj_3_map.on('load', function(){
+        // Month layer with dictionary for colours
+        proj_3_map.addLayer({"id": month_link_name[0], "type": "line","source": month_link_name[0],"source-layer":month_link_all[0][1],
+          "layout":{"line-join": "round","line-cap":"round"},
+          "paint": {
+            "line-width":
+            {
+              property: "hot_log",
+              type: "exponential",
+              stops: [
+                // log values
+                [{zoom: 3,    value: 4}, 1],[{zoom: 3,    value: 16},  4],
+                [{zoom: 8.51, value: 4}, 2],[{zoom: 8.51, value: 16}, 8]
+              ]
+            },
+            "line-color":colour_dict
+          }
+        },'waterway-label');
+
+        var map_counter;
+        for (map_counter = 1; map_counter < month_link_name.length; map_counter++){
+          proj_3_map.addLayer({"id": month_link_name[map_counter], "type": "line","source": month_link_name[map_counter],"source-layer":month_link_all[map_counter][1],
+            "layout":{"line-join": "round","line-cap":"round"},
+            "paint": {
+              "line-width":
+              {
+                property: "hot_log",
+                type: "exponential",
+                stops: [
+                  // log values
+                  [{zoom: 3,    value: 4}, 1],[{zoom: 3,    value: 16},  4],
+                  [{zoom: 8.51, value: 4}, 2],[{zoom: 8.51, value: 16}, 8]
+                ]
+              },
+              "line-color":colour_dict
+            }
+          },'waterway-label');
+          proj_3_map.setLayoutProperty(month_link_name[map_counter], 'visibility', 'none');
+        };
+
+        // Week layer with dictionary for colours
+        proj_3_map.addLayer({
+          // identifier and type
+          "id": map_layer_id[1], "type": "circle","source": map_source_name[1],"source-layer":tiles_all[1][1],
+          "paint": {
+            "circle-radius": {
+              stops: [
+              [0, 0.5],
+              [10, 10]
+            ]},
+            "circle-color": "rgba(44,162,95,0.5)",
+          } //end of painting
+        },'waterway-label');
+
+        // Set visibility
+        proj_3_map.setLayoutProperty(map_layer_id[1], 'visibility', 'visible');
+
+        // Set default map state
+        proj_3_map.setFilter(month_link_name[0], ['==', ['string', ['get', current_direction_selected]], current_filter_city]);
+      });
+
+    </script>
+
+    <!-- Data selectors -->
+    <script>
+      // Legend variables
+      var div_peak_legend = document.getElementById("legend_peak");
+      var div_intense_legend = document.getElementById("legend_intense");
+      var drop_value_measure = document.getElementById("measure_select").value;
+      var drop_value_direction = document.getElementById("direction_select").value;
+      var drop_direction = document.getElementById("direction_select");
+
+      // Legend view function
+      function f_set_map_colour(){
+
+        colour_dict.property = colour_current[0];
+        colour_dict.stops = colour_current[1];
+        colour_dict.type = colour_current[2];
+        proj_3_map.setPaintProperty(current_month_show,"line-color",colour_dict);
+        console.log(colour_current);
+
+      };
+      function f_show_hide_legend(){
+
+        drop_value_measure = document.getElementById("measure_select").value;
+
+        if (drop_value_measure === "measure_heat"){
+          // view/hide colour legends
+          div_peak_legend.style.display = "none";
+          div_intense_legend.style.display = "block";
+
+          // set map colours for month
+          colour_array = [["hot_log",current_layer_heat_colour,"interval"],["hot_min_max",colour_peak,"exponential"]];
+          colour_current = colour_array[0];
+          f_set_map_colour();
+
+        } else if (drop_value_measure == "measure_peak"){
+          // view/hide colour legends
+          div_peak_legend.style.display = "block";
+          div_intense_legend.style.display = "none";
+
+          // set map colours for month
+          colour_array = [["hot_log",current_layer_heat_colour,"interval"],["hot_min_max",colour_peak,"exponential"]];
+          colour_current = colour_array[1];
+          f_set_map_colour();
+
+        } else {
+          // view/hide colour legends
+          div_peak_legend.style.display = "none";
+          div_intense_legend.style.display = "block";
+        };
+
+      }
+      // trigger function to make sure correct legend is shown on load
+      f_show_hide_legend()
+
+      // Listener for measure drop down menu
+      document.getElementById("measure_select").addEventListener("change", function(e){
+        // store new value
+        drop_value_measure = e.target.value;
+        // Change legend view
+        f_show_hide_legend();
+
+        // Change temporal layer viewed
+      });
+
+      // Listener for temporal drop down menu
+      function f_reset_colour_for_measure(){
+        colour_array = [["hot_log",current_layer_heat_colour,"interval"],["hot_min_max",colour_peak,"exponential"]];
+        f_show_hide_legend();
+      }
+      function f_reset_slider(){
+        slider_heading_report.textContent = slider_ref_values[0]; slider_map_3.value = 0; slider_value = 0;
+      };
+      function f_change_slider_values(){
+        drop_value_time = document.getElementById("time_select").value;
+
+        if (drop_value_time === "monthly"){
+          // set reference slider values
+          slider_max = 17;slider_map_3.max = slider_max;slider_heading.innerText = "Month:\xa0";slider_ref_values = list_month;f_reset_slider();
+          // Legend min max ref_values
+          document.getElementById("legend_intense_min").innerText = layer_min_max[0][0];
+          document.getElementById("legend_intense_max").innerText = layer_min_max[0][1];
+
+          // Set dictionary to use for heat layer
+          current_layer_heat_colour = map_layer_heat_colour[0];
+          f_reset_colour_for_measure();
+
+          // Show/hide map layers
+          proj_3_map.setLayoutProperty(map_layer_id[0], 'visibility', 'visible');
+          proj_3_map.setLayoutProperty(map_layer_id[1], 'visibility', 'none');
+          proj_3_map.setLayoutProperty(map_layer_id[2], 'visibility', 'none');
+          current_layer = map_layer_id[0];
+          f_pop_ups(current_layer);
+
+        } else if (drop_value_time == "weekly"){
+          // set reference slider values
+          slider_max = 76;slider_map_3.max = slider_max;slider_heading.innerText = "Week of:\xa0";slider_ref_values = list_week;f_reset_slider();
+          // Legend min max ref_values
+          document.getElementById("legend_intense_min").innerText = layer_min_max[1][0];
+          document.getElementById("legend_intense_max").innerText = layer_min_max[1][1];
+
+          // Set dictionary to use for heat layer
+          current_layer_heat_colour = map_layer_heat_colour[1];
+          f_reset_colour_for_measure();
+
+          // Show/hide map layers
+          proj_3_map.setLayoutProperty(map_layer_id[0], 'visibility', 'none');
+          proj_3_map.setLayoutProperty(map_layer_id[1], 'visibility', 'visible');
+          proj_3_map.setLayoutProperty(map_layer_id[2], 'visibility', 'none');
+          current_layer = map_layer_id[1];
+          f_pop_ups(current_layer);
+
+        } else if (drop_value_time == "daily"){
+          // set reference slider values
+          slider_max = 538;slider_map_3.max = slider_max;slider_heading.innerText = "Day:\xa0";slider_ref_values = list_day;f_reset_slider();
+          // Legend min max ref_values
+          document.getElementById("legend_intense_min").innerText = layer_min_max[2][0];
+          document.getElementById("legend_intense_max").innerText = layer_min_max[2][1];
+
+          // Set dictionary to use for heat layer
+          current_layer_heat_colour = map_layer_heat_colour[2];
+          f_reset_colour_for_measure();
+
+          // Show/hide map layers
+          proj_3_map.setLayoutProperty(map_layer_id[0], 'visibility', 'none');
+          proj_3_map.setLayoutProperty(map_layer_id[1], 'visibility', 'none');
+          proj_3_map.setLayoutProperty(map_layer_id[2], 'visibility', 'visible');
+          current_layer = map_layer_id[2];
+          f_pop_ups(current_layer);
+
+        } else {
+          // Default state for reference slider values (monthly)
+          slider_max = 17;slider_map_3.max = slider_max;slider_heading.innerText = "Month:\xa0";slider_ref_values = list_month;f_reset_slider();
+          // Legend min max ref_values
+          document.getElementById("legend_intense_min").innerText = layer_min_max[0][0];
+          document.getElementById("legend_intense_max").innerText = layer_min_max[0][1];
+
+          current_layer = map_layer_id[0];
+          //f_pop_ups();
+        };
+
+      };
+
+      // Handling the change of temporal resolution
+      /*document.getElementById("time_select").addEventListener("change", function(e){
+        // store new value
+        drop_value_time = e.target.value;
+        // Change slider values
+        f_change_slider_values();
+        f_pop_ups(current_layer);
+        f_daily_zoom_warning();
+
+        // Change temporal layer viewed
+      });*/
+
+      document.getElementById("direction_select").addEventListener("change", function(e){
+        // store new value
+        drop_value_direction = e.target.value;
+
+        current_direction_selected = "city"+drop_value_direction
+        proj_3_map.setFilter(current_month_show, ['==', ['string', ['get', current_direction_selected]], current_filter_city]);
+
+
+
+        // Change temporal layer viewed
+      });
+
+    </script>
+
+    <!-- Slider set up-->
+    <script>
+      var slider_min = 0;
+      var slider_starter_value = slider_min;
+      var slider_max = 17;
+      var slider_value = document.getElementById("slider_map_3_input").value;
+      var slider_map_3 = document.getElementById("slider_map_3_input");
+      var slider_heading = document.getElementById("slider_label");
+      var slider_heading_report = document.getElementById("slider_value_text");
+      var slider_ref_values = list_month;
+
+      var tiles_daily_min_max = ["1k","1.5m+"];
+      var tiles_weekly_min_max = ["13k","9m+"];
+      var tiles_monthly_min_max = ["0.1m","35m+"];
+      var layer_min_max = [tiles_monthly_min_max,tiles_weekly_min_max,tiles_daily_min_max];
+
+      // timer object
+      var intervalId;
+      var movement_speed = 450;
+
+      function f_update_slider_daily_react(){
+        slider_map_3.value = slider_value;
+        slider_heading_report.textContent = slider_ref_values[slider_value];
+        if(drop_value_time === "daily"){
+          proj_3_map.setFilter(current_layer, ['==', ['number', ['get', 'time_id']], slider_value]);
+        };
+      };
+
+      function f_update_slider_text_and_value(){
+        slider_map_3.value = slider_value;
+        slider_heading_report.textContent = slider_ref_values[slider_value];
+
+      };
+
+      // updates slider value instantly
+      slider_map_3.addEventListener('input', function(e) {
+        current_month_show = month_link_name[parseInt(slider_value)];
+        proj_3_map.setLayoutProperty(current_month_show, 'visibility', 'none');
+        // deselect any selections (filters) previously made
+        proj_3_map.setFilter(current_month_show, ['==', ['string', ['get', current_direction_selected]], ""]);
+
+        slider_value = parseInt(e.target.value);
+        f_update_slider_text_and_value();
+      });
+
+      // Slider action for after change to update map
+      slider_map_3.addEventListener('change', function(e) {
+        // show new layer and udpate values
+        f_update_show_next_layer();
+      });
+
+      function f_update_hide_current_layer(){
+        slider_map_3.value = slider_value;
+        slider_heading_report.textContent = slider_ref_values[slider_value];
+        current_month_show = month_link_name[parseInt(slider_value)];
+        // hide layer
+        proj_3_map.setLayoutProperty(current_month_show, 'visibility', 'none');
+        // deselect any selections (filters) previously made
+        proj_3_map.setFilter(current_month_show, ['==', ['string', ['get', current_direction_selected]], ""]);
+      };
+
+      function f_update_show_next_layer(){
+        slider_map_3.value = slider_value;
+        slider_heading_report.textContent = slider_ref_values[slider_value];
+        //console.log(month_link_name[parseInt(slider_value)]);
+        current_month_show = month_link_name[parseInt(slider_value)];
+        // filter for only selected city (if any)
+        proj_3_map.setFilter(current_month_show, ['==', ['string', ['get', current_direction_selected]], current_filter_city]);
+        f_set_map_colour();
+        proj_3_map.setLayoutProperty(current_month_show, 'visibility', 'visible');
+      };
+
+
+
+    </script>
+
+    <!-- Playback buttons -->
+    <script>
+      // Variables holding buttons
+      var button_map_play = document.getElementById("button_play");
+      var button_map_pause = document.getElementById("button_pause");
+      var button_map_reset = document.getElementById("button_reset");
+      var button_map_forward = document.getElementById("button_step_fwd");
+      var button_map_back = document.getElementById("button_step_bk");
+
+
+      // Define a function to show/hide play button
+      function f_play_pause_visability_default(){
+        button_map_play.hidden = false;
+        button_map_pause.hidden = true;
+        button_map_forward.hidden = false;
+        button_map_back.hidden = false;
+        clearInterval(intervalId);
+      };
+      function f_play_pause_visability_playing(){
+        button_map_play.hidden = true;
+        button_map_pause.hidden = false;
+        button_map_forward.hidden = true;
+        button_map_back.hidden = true;
+
+      };
+      // Start up state
+      f_play_pause_visability_default();
+
+      //
+
+      // Play actions
+      button_map_play.addEventListener("click", function(){
+        f_play_pause_visability_playing();
+
+        intervalId = setInterval(function(){
+          // if player gets to the end, clear timer; reset playback controls, reset slider;
+          if(parseInt(slider_value) === parseInt(slider_max)){
+            f_play_pause_visability_default();
+            // hide layer
+            f_update_hide_current_layer();
+            // increment value
+            f_reset_slider();
+            // show new layer and udpate values
+            f_update_show_next_layer();
+            f_update_slider_text_and_value();
+          } else {
+            // hide layer
+            f_update_hide_current_layer();
+            // increment value
+            slider_value++;
+            // show new layer and udpate values
+            f_update_show_next_layer();
+            f_update_slider_text_and_value();
+
+          };
+        }, movement_speed);
+      });
+      button_map_pause.addEventListener("click", function(){f_play_pause_visability_default();});
+      button_map_reset.addEventListener("click", function(){f_update_hide_current_layer();f_reset_slider();f_update_show_next_layer();});
+      button_map_forward.addEventListener("click", function(){
+        if (parseInt(slider_value) < parseInt(slider_max)){
+          // hide layer
+          f_update_hide_current_layer();
+          // increment value
+          slider_value = parseInt(slider_value) + 1;
+          // show new layer and udpate values
+          f_update_show_next_layer();
+          f_update_slider_text_and_value();
+        }
+      });
+      button_map_back.addEventListener("click", function(){
+        if (parseInt(slider_value) > 0){
+          // hide layer
+          f_update_hide_current_layer();
+          // increment value
+          slider_value = parseInt(slider_value) - 1;
+          // show new layer and udpate values
+          f_update_show_next_layer();
+          f_update_slider_text_and_value();
+        }
+      });
+
+    </script>
+
+    <!-- Click on point -->
+    <script>
+      // click on empty space to clear lines
+
+      // default info box state
+      document.getElementById("map_warning").style.display = "none";
+
+      proj_3_map.on("click",function(e){
+
+        current_filter_city = "";
+        //console.log(current_filter_city);
+        proj_3_map.setFilter(current_month_show, ['==', ['string', ['get', current_direction_selected]], current_filter_city]);
+        document.getElementById("map_warning").style.display = "none";
+      });
+
+      // click to show lines
+      proj_3_map.on("click",map_layer_id[1],function(e){
+
+        current_filter_city = e.features[0].properties.name;
+        console.log(current_filter_city);
+        proj_3_map.setFilter(current_month_show, ['==', ['string', ['get', current_direction_selected]], current_filter_city]);
+
+        document.getElementById("map_warning").style.display = "block";
+      });
+
+
+
+    </script>
+
+    <!-- Pop up bubbles -->
+    <script>
+
+      current_layer = map_layer_id[1];
+      function f_pop_ups(current_layer){
+        // Create pop-up
+        var popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false
+        })
+        //.setHTML("Hi");
+
+        // Action when we enter layer
+        proj_3_map.on('mouseenter', current_layer, function(e) {
+          // Change the cursor style as a UI indicator.
+          var mouse_enter_slider_value = slider_value;
+          proj_3_map.getCanvas().style.cursor = 'pointer';
+          console.log(e)
+          var coordinates = e.features[0].geometry.coordinates.slice();
+          var description = '<b>City:</b> ' + e.features[0].properties.name + "<br>" + e.features[0].properties.Name_part_1 + "," + e.features[0].properties.Name_part_2
+                            ;
+          popup
+              .setLngLat(coordinates)
+              .setHTML(description)
+              .addTo(proj_3_map);
+        });
+        // Action when we leave layer
+        proj_3_map.on('mouseleave', current_layer, function() {
+            proj_3_map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+      };
+      //run above on load
+      f_pop_ups(current_layer);
+
+    </script>
+
+    <!-- Fly buttons -->
+    <script>
+
+      var current_map_zoom = 2.7;
+
+      /*function f_daily_zoom_warning(){
+        if((current_map_zoom<6.5) & (drop_value_time === "daily")){
+          document.getElementById("map_warning").style.display = "block";
+
+          //div_peak_legend.style.display = "block";
+        } else {
+          document.getElementById("map_warning").style.display = "none";
+        }
+      };*/
+
+      proj_3_map.on("zoom", function(){
+
+          //calculate variables
+          var zoom = proj_3_map.getZoom();
+          var zoom_report = zoom.toFixed(2);
+          current_map_zoom = zoom;
+          console.log(current_map_zoom);
+
+          //f_daily_zoom_warning();
+
+
+
+
+
+          //var centre_point = proj_3_map.getCenter();
+          //var centre_point_report = `${centre_point.lat.toFixed(2)},${centre_point.lng.toFixed(2)}`;
+
+          //report back to elements
+          //document.getElementById("zoom_level").innerHTML = zoom_report;
+          //document.getElementById("centre_of_map").innerHTML = centre_point_report;
+      });
+      /*proj_3_map.on('click', function(e) {
+
+        var coordinates = e.lngLat;//[0].geometry.coordinates.slice();
+        console.log(coordinates);
+
+        // drop value = daily
+
+        // if zoom less than 6.5 fly there, else do nothing
+        if((current_map_zoom<6.5) &(drop_value_time === "daily")){
+          proj_3_map.flyTo({
+          center: [
+          coordinates.lng,
+          coordinates.lat
+          ],
+          essential: true, // this animation is considered essential with respect to prefers-reduced-motion
+          zoom: 6.5
+          });
+        }
+
+      });*/
+
+      //f_daily_zoom_warning();
+
+
+    </script>
+
+  </body>
+
+</html>
