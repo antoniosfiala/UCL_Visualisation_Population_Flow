@@ -122,7 +122,9 @@
 
         <p0>Description:<br></p0>
         <p1>This project explores the direction of travel at a monthly level between cities in China.
-          You can choose to view migration towards or away from a city as well as a colourscheme which will help you uncover different patterns in the data.</p1>
+          You can choose to view migration towards or away from a city as well as a colourscheme which will help you uncover different patterns in the data.
+          Click on a city to see its connections, click on a blank space on the map to deselect your city. If no connections appear try changing directions of travel. Alternatively, it may be possible that no data is available.
+        </p1>
         <hr class="divider1">
 
         <p0>Data exploratory controls:<br></p0>
@@ -178,7 +180,6 @@
               <input id="slider_map_3_input" class="row" type="range" min="0" max="17" step="1" value="0"/>
         </div>
         <br>
-        <p0>Potential findings and presets of interest:<br></p0>
         <br>
         <br>
         <p0>Source:<br></p0>
@@ -191,8 +192,8 @@
         <div id="proj_3_map_main">
             <div id="proj_3_map"></div>
         </div>
-        <div class='map_overlay' id="map_warning"><p3>Navigation message:</p3><p4>Daily data is only visible at zoom of 6 or greater.<br>
-          <p3>Click on the map...</p3>...to fly to an area at correct zoom.</p4></div>
+        <!--<div class='map_overlay' id="map_warning"><p3>Navigation message:</p3><p4>Daily data is only visible at zoom of 6 or greater.<br>
+          <p3>Click on the map...</p3>...to fly to an area at correct zoom.</p4></div>-->
 
       </div>
     </main>
@@ -572,7 +573,7 @@
 
       // timer object
       var intervalId;
-      var movement_speed = 450;
+      var movement_speed = 1000;
 
       function f_update_slider_daily_react(){
         slider_map_3.value = slider_value;
@@ -719,14 +720,14 @@
       // click on empty space to clear lines
 
       // default info box state
-      document.getElementById("map_warning").style.display = "none";
+      //document.getElementById("map_warning").style.display = "none";
 
       proj_3_map.on("click",function(e){
 
         current_filter_city = "";
         //console.log(current_filter_city);
         proj_3_map.setFilter(current_month_show, ['==', ['string', ['get', current_direction_selected]], current_filter_city]);
-        document.getElementById("map_warning").style.display = "none";
+        //document.getElementById("map_warning").style.display = "none";
       });
 
       // click to show lines
@@ -736,7 +737,7 @@
         console.log(current_filter_city);
         proj_3_map.setFilter(current_month_show, ['==', ['string', ['get', current_direction_selected]], current_filter_city]);
 
-        document.getElementById("map_warning").style.display = "block";
+        //document.getElementById("map_warning").style.display = "block";
       });
 
 
