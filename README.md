@@ -10,4 +10,4 @@ The accompanying **report** can be found [here](https://github.com/antoniosfiala
 Our pitch **presentation** can be found [here](https://github.com/antoniosfiala/UCL_Visualisation_Population_Flow/blob/master/DV_Group_5_presentation.pdf).
 
 **Team comprised of (country of origin, country of work):**<br> 
-Xiang Zhou 🇨🇳🇨🇳, Xin Zhao 🇨🇳🇨🇳,Diqiu Yang 🇨🇳🇬🇧 & Antonios Fiala 🇬🇷🇬🇧
+Xiang Zhou 🇨🇳🇨🇳, Xin Zhao 🇨🇳🇨🇳,Diqiu Yang 🇨🇳🇬🇧 & Antonios Fiala 🇬🇷🇨🇿🇬🇧
