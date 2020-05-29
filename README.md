@@ -7,7 +7,7 @@ Link to the website can be found [here](https://antoniosfiala.github.io/UCL_Visu
 
 The accompanying report can be found [here](https://github.com/antoniosfiala/UCL_Visualisation_Population_Flow/blob/master/DV_Group_5_report.pdf).
 
-Our pitch presentation can be found [here]().
+Our pitch presentation can be found [here](https://github.com/antoniosfiala/UCL_Visualisation_Population_Flow/blob/master/DV_Group_5_presentation.pdf).
 
 **Team comprised of (country of origin, country of work):**<br> 
 Xiang Zhou 🇨🇳🇨🇳, Xin Zhao 🇨🇳🇨🇳,Diqiu Yang 🇨🇳🇬🇧 & Antonios Fiala 🇬🇷🇬🇧
